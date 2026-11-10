@@ -172,9 +172,19 @@ New objects: **Laptop** (pulls to Focus; the phone's reach *lowers* Focus by 2),
 **Maya's postcard** (pulls to Call Maya). Slots can refuse objects that make no
 sense there (no food or laptops on the coat hook or shoe rack).
 
-**Ending:** day 49, follow-up with Dr Reyes. Her line depends on how many weeks
-went to plan. Habit bars (week 1 vs now) and **your shift list**: all seven tips,
-ticked where you nailed the week. No invented health numbers. Closing line:
+**Weekly weigh-in:** every result card turns that evening (the flat stays set up
+all week) into a weigh-in: what helped, what held you back, and the kg change.
+Model in `src/health.js`, formulas from Momentum's `scr_body`: old habits = +300
+kcal/day; proper dinners -450, no snacking -200, asleep by 23:00 -275 (Al Khatib),
+running -210 and 150 active min; 7,700 kcal per kg; capped at -1 / +0.6 kg a week.
+Good play lands about -0.5 kg a week (the goal Dr Reyes sets); doing nothing gains.
+
+**Ending:** day 49, **retest with Dr Reyes**. Day 1 vs day 49: weight, blood
+pressure (~1 mmHg per kg, Neter; exercise effect, Cornelissen), HbA1c (labelled an
+early, illustrative estimate: it reflects ~3 months), 3-year diabetes risk (29%
+x 0.84 per kg, Hamman/DPP), active minutes vs 150, sleep vs 7 h. Her line follows
+the weight result. Beside it, **your shift list**: all seven tips, ticked where you
+nailed the week. Closing line:
 *"You didn't find more willpower. You shifted what was around you."*
 Stars are one per goal met; there is no bonus star.
 

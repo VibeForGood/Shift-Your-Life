@@ -71,13 +71,14 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     },
     {
       draw: function (s, c) {
-        var big = SYL.text(s, 640, 200, '-58%', 110, C.good, { fontStyle: 'bold' }).setOrigin(0.5);
+        var big = SYL.text(s, 640, 190, '58%', 110, C.good, { fontStyle: 'bold' }).setOrigin(0.5);
         c.add(big);
-        c.add(SYL.text(s, 640, 280, 'lower risk of developing type 2 diabetes', 22, C.ink).setOrigin(0.5));
-        c.add(SYL.text(s, 640, 316, '(the medicine metformin: -31%)', 18, C.inkSoft).setOrigin(0.5));
+        c.add(SYL.text(s, 640, 270, 'fewer people went on to get type 2 diabetes', 24, C.ink).setOrigin(0.5));
+        c.add(SYL.text(s, 640, 306, 'when they lost 7% of their weight and moved 150 minutes a week', 18, C.inkSoft).setOrigin(0.5));
+        c.add(SYL.text(s, 640, 334, '(for comparison, the diabetes drug metformin: 31% fewer)', 16, C.inkSoft).setOrigin(0.5));
         s.tweens.add({ targets: big, scale: { from: 0.6, to: 1 }, duration: 500, ease: 'Back.out' });
       },
-      text: "'In a big trial, people like you who lost about 7% of their weight and moved 150 minutes a week cut their risk by more than half. For you, 7% is about 8 kilos. Not 40. Eight.'",
+      text: "Dr Reyes: 'For you, 7% is about 8 kilos. You don't need to lose it all at once. Half a kilo a week is safe and it lasts. That's about 3.5 kilos by your retest in seven weeks.'",
       src: 'Diabetes Prevention Program: Knowler et al., NEJM, 2002',
     },
     {
@@ -106,7 +107,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
           s.tweens.add({ targets: [img, t, n], alpha: 1, y: '-=8', duration: 300, delay: 150 + i * 180 });
         });
       },
-      text: "You can't make yourself do anything. But you can shift what's around you. Seven weeks, seven shifts, one evening at a time. Your follow-up with Dr Reyes is on day 49.",
+      text: "You can't make yourself do anything. But you can shift what's around you. Seven weeks, seven shifts, one evening at a time. Then Dr Reyes retests you on day 49.",
       last: true,
     },
   ];
