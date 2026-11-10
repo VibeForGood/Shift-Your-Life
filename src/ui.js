@@ -15,6 +15,13 @@ SYL.C = {
   pip: 0x9ac1ff,
   hidden: 0xb9ad9c,
 };
+// Habit bars, shared by the Play and Ending screens: [habit, short label, colour, long label]
+SYL.HABIT_ROWS = [
+  ['run', 'Run', SYL.C.good, 'Running'], ['scroll', 'Scroll', SYL.C.trap, 'Scrolling'],
+  ['eat', 'Dinner', SYL.C.good, 'Proper dinners'], ['snack', 'Snack', SYL.C.trap, 'Snacking'],
+  ['focus', 'Focus', SYL.C.good, 'Focused work'], ['rest', 'Rest', SYL.C.rest, 'Resting'],
+  ['call', 'Friends', SYL.C.good, 'Calling friends'], ['read', 'Read', SYL.C.rest, 'Reading in bed'],
+];
 SYL.hex = function (n) { return '#' + n.toString(16).padStart(6, '0'); };
 SYL.FONT = '"Trebuchet MS", "Segoe UI", Arial, sans-serif';
 
@@ -40,11 +47,21 @@ SYL.button = function (scene, x, y, w, h, label, onClick, opts) {
   c.setSize(w, h).setInteractive({ useHandCursor: true });
   c.on('pointerover', function () { draw(true); });
   c.on('pointerout', function () { draw(false); });
-  c.on('pointerdown', function () { if (c.enabled) onClick(); });
+  c.on('pointerdown', function () { if (c.enabled) { SYL.audio.play('click'); onClick(); } });
   c.setEnabled = function (v) { c.enabled = v; t.setAlpha(v ? 1 : 0.6); draw(false); return c; };
   c.setLabel = function (s) { t.setText(s); return c; };
   draw(false);
   return c;
+};
+
+// Mute toggle in the corner of every scene, plus the M key.
+SYL.muteButton = function (scene) {
+  var label = function () { return SYL.audio.isMuted() ? 'Sound: off' : 'Sound: on'; };
+  var t = SYL.text(scene, 1272, 712, label(), 13, SYL.C.inkSoft).setOrigin(1, 1).setDepth(100).setInteractive({ useHandCursor: true });
+  var toggle = function () { SYL.audio.toggleMute(); t.setText(label()); };
+  t.on('pointerdown', toggle);
+  scene.input.keyboard.on('keydown-M', toggle);
+  return t;
 };
 
 // Promise helpers that respect the scene's time scale (speed toggle).

@@ -1,4 +1,4 @@
-// Pure simulation of Pip's evening. Deterministic: same inputs, same result.
+// Pure simulation of your evening. Deterministic: same inputs, same result.
 // No Phaser here, so the Node level checker can run it too.
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
@@ -18,6 +18,12 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     if (d === 0) return W.reach.same * mul;
     if (d === 1 && s.kind !== 'hidden') return W.reach.adjacent * mul;
     return 0;
+  }
+
+  // Can this object go in this slot at all?
+  function allowed(objId, slotId) {
+    var s = slotById[slotId];
+    return !!s && !(s.no && s.no.indexOf(objId) >= 0);
   }
 
   function habitKey(action) {
@@ -189,6 +195,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
 
   SYL.sim = {
     reach: reach,
+    allowed: allowed,
     simulate: simulate,
     updateHabits: updateHabits,
     movesUsed: movesUsed,

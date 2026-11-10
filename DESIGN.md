@@ -1,21 +1,26 @@
 # Shift Your Life — Design Document
 
 GitHub Game Off 2026 · Theme: **SHIFT** · Solo dev + Claude (vibe coded)
-Rules: see `JAM_RULES.md`. Deadline **Dec 1, 2026, 13:37 PST**. Target submit **Nov 28**.
+Rules: see `JAM_RULES.md`. Earlier versions of the idea: `../Momentum`, `../Momentum_Cards`. Deadline **Dec 1, 2026, 13:37 PST**. Target submit **Nov 28**.
 
 ---
 
 ## 1. Pitch
 
-> A puzzle game where you rearrange someone's apartment to nudge their evening.
-> You can't make them do anything. You can only **shift** what's around them.
+> You're 34, 118 kg, and your doctor has just told you that you have prediabetes.
+> You can't make yourself do anything. You can only **shift** what's around you.
 
-**Core lesson (never stated as a lecture):** willpower is unreliable; environment
-and habit do the heavy lifting. The player learns it by playing, because the
-only tool they have is the environment.
+A puzzle game where you rearrange your own flat to nudge your evening, one week
+and one life area at a time: movement, sleep, food, fun, focus, friends and hard days.
 
-**Tone:** dry humour, warm underneath. Exaggerated, readable reactions. Never
-preachy, never about weight, calories or body shape.
+**Core lesson:** willpower is unreliable; environment and habit do the heavy
+lifting. The player learns it by playing, because the only tool they have is the
+environment. **Every week ends with one concrete thing to try in real life**, and
+the ending hands the player their whole "shift list".
+
+**Tone:** dry humour, warm underneath. Weight and health are part of the story
+(as in Momentum, the earlier version of this idea): stated plainly by the doctor,
+backed by research, never a joke, never shaming. The character is drawn with care.
 
 ## 2. Pillars
 
@@ -27,19 +32,24 @@ Anything that doesn't serve these three is a stretch goal or cut.
 
 ## 3. The character
 
-**Pip** — a small round blob (they/them) living a tired adult life. Big eyes,
-squash-and-stretch movement, very expressive. A non-human character keeps it
-funny and avoids body-image issues entirely.
+**You.** Thirty-four, claims analyst at Halcyon Insurance, a one-bed flat on Elm
+Street (carried over from Momentum). 118 kg, about five hours' sleep, takeaway most
+nights, hasn't replied to Maya since March. On Monday Dr Reyes gives you your
+results: HbA1c 6.1% (prediabetes), blood pressure 142/91. Follow-up on day 49.
 
-Pip has no personality stats. Their personality is in **animation and reaction**:
-a double-take at the phone, a reluctant sigh putting on shoes, a tiny victory
-hop after a run, melting into the couch.
+Second person throughout: *Shift Your Life*. The UI says "your habits", "you fell
+asleep at 22:30". The character's personality is in animation: tired eyes after
+scrolling, a victory hop after a run, a happy face on the phone to Maya.
+
+**Intro (Story scene):** seven short cards adapted from Momentum's opening: who you
+are, the small defaults, the blood results, the Diabetes Prevention Program (-58%),
+"don't rely on willpower", then the seven shifts and **Time to shift**. Skippable.
 
 ## 4. Core loop (≈ 2 min per attempt, instant retry)
 
 1. **Brief card** — "Week 3. Rough day at work. Goals: eat a proper dinner · asleep by 23:00."
 2. **Plan** — the room is shown as it is. Hold **SHIFT** to see pull lines. Drag up to **N** objects into slots. Undo freely; moves count only when you press Run.
-3. **Run** — the evening plays from 18:00. Pip walks a fixed route. At each **decision point** time slows, a thought bubble shows the competing pulls as bars, Pip picks one, reacts, and the action plays out. Walking is fast. Speed toggle 1× / 2× / 4×.
+3. **Run** — the evening plays from 18:00. You walk a fixed route. At each **decision point** time slows, a thought bubble shows the competing pulls as bars, the strongest wins, reacts, and the action plays out. Walking is fast. Speed toggle 1× / 2× / 4×.
 4. **Result** — goals ticked or crossed, stars, and one line of real research tied to what just happened. **Retry** (same week) or **Next week**.
 
 ## 5. Systems
@@ -48,7 +58,7 @@ hop after a run, melting into the couch.
 
 One top-down cutaway room, fixed camera, 1280×720.
 
-Pip's route through the evening (waypoints = decision points):
+Your route through the evening (waypoints = decision points):
 
 ```
  [Front door] → [Hallway] → [Kitchen] → [Living room / couch] → [Bedroom] → [Bed]
@@ -71,7 +81,7 @@ Each waypoint has **1–2 slots** (≈ 9 slots total). Objects can only sit in s
 
 | Object | Pulls towards | Notes / conflicts |
 |---|---|---|
-| Phone | **Scroll** (strong) | It's also the **alarm**: must be in the bedroom at night or Pip oversleeps (unless Alarm clock is placed). |
+| Phone | **Scroll** (strong) | It's also the **alarm**: must be in the bedroom at night or you oversleep (unless Alarm clock is placed). |
 | Running shoes | **Run** | Strongest at the front door. |
 | Headphones | boosts **Run** | Temptation bundling: only matters next to the shoes. Rain twist cancels its effect without them. |
 | Snack jar | **Snack** (strong) | |
@@ -107,7 +117,7 @@ All numbers live in one data file so balancing is a one-line change.
 
 ### 5.5 Habits (the progression mechanic)
 
-Each action Pip *completes* in a week builds that habit:
+Each action you *complete* in a week builds that habit:
 
 ```
 habit += (1 − habit) × 0.35     // fast early, levels off (Lally et al.)
@@ -116,10 +126,10 @@ habit −= 0.05                    // a missed week only dents it, never resets
 
 Habits carry between weeks and add to the action's score. **Built habits need
 less environmental support, which frees moves for new goals.** Week 1 needs every
-move to get Pip running; by Week 4 running needs one nudge, and the moves go to
+move to get you running; by Week 4 running needs one nudge, and the moves go to
 sleep and food. Each level is framed as **one week** to keep the habit timescale honest.
 
-Bad habits build too: if Pip scrolls every week, scrolling gets harder to beat.
+Bad habits build too: if you scroll every week, scrolling gets harder to beat.
 
 ### 5.6 SHIFT view
 
@@ -132,9 +142,9 @@ Hold SHIFT during planning (and during the run, paused):
 
 ### 5.7 Decision bubble (readability)
 
-At each decision during the run: time slows to ~0.3×, a bubble over Pip shows
+At each decision during the run: time slows to ~0.3×, a bubble over you shows
 the top 2–3 competing actions as bars with object icons, the winner flashes,
-Pip reacts. The player should always be able to answer "why did that happen?"
+You react. The player should always be able to answer "why did that happen?"
 without reading a sentence.
 
 ### 5.8 Stars
@@ -143,18 +153,30 @@ without reading a sentence.
 - ★ bonus: solved with fewer moves than allowed.
 Retry is instant; stars are the reason to retry.
 
-## 6. Levels (5 weeks)
+## 6. Levels (7 weeks, one shift each)
 
-| Week | Twist | Goals | Moves | Teaches |
-|---|---|---|---|---|
-| 1 | — (tutorial) | Go for a run | 2 | Drag objects, run, SHIFT view. Phone on couch beats shoes in the closet. |
-| 2 | — | Run · asleep by 23:00 | 3 | Phone conflict: alarm vs bedtime scroll. Book as competitor. |
-| 3 | **Rough day** (Rest +, Run −) | Eat a proper dinner · asleep by 23:00 | 3 | Rest is a valid choice. Fruit vs snacks on one counter. Alarm clock unlocked. |
-| 4 | **Raining** (Run − unless headphones) | Run · no snacking · asleep by 23:00 | 3 | Temptation bundling. Running habit from weeks 1–2 now helps. |
-| 5 | **Overtime** (home at 20:00, one object locked) | Run or Rest · eat well · asleep by 23:00 | 2 | Everything learned, with less room. |
+Each week opens with a **Shift card** (topic, brief, goals) and ends with a
+**Try this in your life** panel (a concrete action, why it works, the source).
 
-**Ending:** a summary of the five weeks with habit meters, and one closing line:
-*"Pip didn't find more willpower. Their apartment just got on their side."*
+| Week | Shift | Twist | Goals | Moves | Real-life tip |
+|---|---|---|---|---|---|
+| 1 | Move | — | Run | 2 | Shoes by the front door (Wood & Neal 2007) |
+| 2 | Sleep | — | Run · asleep by 23:00 · alarm | 3 | Phone out of the bedroom, alarm clock, book (Exelmans 2016, Al Khatib 2017) |
+| 3 | Food | Rough day | Dinner · no snacking · asleep · alarm | 3 | Prep the good option, hide the snacks (Hollands 2019) |
+| 4 | Make it fun | Raining | Run · no snacking · asleep · alarm | 3 | Temptation bundling (Milkman 2014) |
+| 5 | Focus | Deadline stress | An hour on the project · asleep · alarm | 3 | Phone in another room, batch notifications (Leroy 2009, Mark 2008) |
+| 6 | Friends | Lonely week | Call Maya · dinner · asleep · alarm | 3 | A reminder of a friend where you sit; call, don't scroll (Holt-Lunstad 2010, Hall 2019) |
+| 7 | Hard days | Late shift | Run or rest · dinner · asleep · alarm | 2 | If-then plans for bad days (Gollwitzer & Sheeran 2006, Lally 2010) |
+
+New objects: **Laptop** (pulls to Focus; the phone's reach *lowers* Focus by 2),
+**Maya's postcard** (pulls to Call Maya). Slots can refuse objects that make no
+sense there (no food or laptops on the coat hook or shoe rack).
+
+**Ending:** day 49, follow-up with Dr Reyes. Her line depends on how many weeks
+went to plan. Habit bars (week 1 vs now) and **your shift list**: all seven tips,
+ticked where you nailed the week. No invented health numbers. Closing line:
+*"You didn't find more willpower. You shifted what was around you."*
+Stars are one per goal met; there is no bonus star.
 
 ## 7. Research lines (one per result screen)
 
@@ -183,7 +205,7 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 - Sound effects + one music loop (Audio is a judged category)
 
 **Stretch (in order)**
-1. Juice: squash/stretch, particles, screen-shake on big decisions, Pip reactions
+1. Juice: squash/stretch, particles, screen-shake on big decisions, character reactions
 2. If-then card: one per week, e.g. "After I get home → shoes on" (anchors an action to a waypoint)
 3. What-the-hell momentum: a slip raises the pull of similar slips for the rest of the evening
 4. Sleep quality carrying into the next week
@@ -195,7 +217,7 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 - **Engine:** Phaser 3 (vendored `phaser.min.js` in the repo, no CDN, no build step).
 - **Plain `<script>` tags**, no bundler, so `index.html` can be opened by double-clicking.
 - **Art:** clean flat shapes drawn in code (Phaser Graphics + generated textures). Soft palette, rounded shapes, bold icons. No image assets to license.
-- **Audio:** sound effects generated in code with ZzFX (MIT, tiny). One CC0 music loop, credited in the README.
+- **Audio:** sound effects and the music loop are synthesised in code with the Web Audio API (`src/audio.js`). No files, nothing to license.
 - **Simulation separate from rendering:** `sim.js` is pure logic (no Phaser), so it can run headless in Node.
 - **Level checker:** a Node script brute-forces every arrangement within each week's move limit to confirm each level is **solvable**, and **not solvable with zero moves** or by one obvious move. Run it after every balance change.
 - **Testing:** Playwright (pre-installed) loads the game, plays scripted runs, and takes screenshots so bugs are caught before you see them.
@@ -228,7 +250,7 @@ the browser", 1280×720 viewport with fullscreen button. Optionally also GitHub 
 |---|---|---|
 | Nov 5–8 | **M1 Greybox** | Boxes-and-circles room, drag/drop, sim runs, Week 1 playable, level checker works |
 | Nov 9–13 | **M2 Game** | Decision bubble, SHIFT view, all 5 weeks, habits, stars, retry. *Playable start to finish.* |
-| Nov 14–19 | **M3 Look & sound** | Art pass, Pip animations, sound effects, music, title/ending |
+| Nov 14–19 | **M3 Look & sound** | Art pass, character animations, sound effects, music, title/ending |
 | Nov 20–24 | **M4 Playtest** | Friends play it cold; fix confusion; balance; stretch goals if time |
 | Nov 25–28 | **M5 Ship** | README, LICENSE, credits, AI disclosure, itch page, screenshots, **submit Nov 28** |
 | Nov 29–Dec 1 | Buffer | Only fixes |

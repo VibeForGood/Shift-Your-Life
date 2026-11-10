@@ -127,4 +127,7 @@ Keep this updated so the itch.io AI disclosure is accurate.
 | 2026-11-04 | Claude Code | Brainstorming the game concept, synthesising peer-review feedback into a design plan, formatting this rules file. |
 | 2026-11-04 | Claude Code | Writing the design document (DESIGN.md). |
 | 2026-11-04 | Claude Code | Milestone 1: all game code (Phaser scenes, simulation, level data), level checker and smoke test. |
+| 2026-11-09 | Claude Code | Design review; synthesised sound effects and music loop (`src/audio.js`); themed title screen; Week 5 renamed "Late shift"; itch.io page draft (ITCH_PAGE.md). |
+| 2026-11-09 | Claude Code | Art pass (`src/art.js`): code-drawn object icons, furnished apartment, Pip expressions and animations, evening lighting, particles. |
+| 2026-11-10 | Claude Code | Story rework: human main character from Momentum, intro story scene, Focus and Friends weeks, week cards, "Try this in your life" tips, Dr Reyes ending, slot restrictions. |
 | 2026-11-04 | Copilot SDK in VS Code | Independent review of the game design, implementation, balance checks and submission readiness. |

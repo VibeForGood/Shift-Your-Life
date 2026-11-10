@@ -1,18 +1,23 @@
-// The five weeks. Each level is one week of Pip's life.
+// The seven weeks. Each level is one week, one shift.
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
 // Goal types:
-//   { type: 'did', action }        Pip did this action
-//   { type: 'didnt', action }      Pip never did this action
-//   { type: 'any', actions }       Pip did at least one of these
+//   { type: 'did', action }        you did this action
+//   { type: 'didnt', action }      you never did this action
+//   { type: 'any', actions }       you did at least one of these
 //   { type: 'asleepBy', time }     asleep by this time (minutes after midnight)
 //   { type: 'alarm' }              an alarm (phone or clock) is in the bedroom, not hidden
+//
+// topic: the life area this week is about (shown on the week card).
+// tip:   the real-life takeaway shown after the week ("Try this in your life").
+//        Every claim must match SelfImprovement_Research.md.
 SYL.LEVELS = [
   {
     id: 'w1',
     week: 1,
     title: 'Week 1',
-    brief: 'Pip wants to start running. Pip also really likes their phone.',
+    topic: { name: 'Move', icon: 'shoes' },
+    brief: "Dr Reyes wants 150 active minutes a week. You'd like to start running. You'd also really like to look at your phone.",
     twist: null,
     moves: 2,
     layout: {
@@ -24,12 +29,18 @@ SYL.LEVELS = [
     },
     locked: [],
     goals: [{ type: 'did', action: 'run', label: 'Go for a run' }],
+    tip: {
+      do: 'Leave your running shoes by the front door, where they are the first thing you see when you get home.',
+      why: 'Habits are links between a place and an action. Put the cue for the good habit where your evening starts.',
+      src: 'Wood & Neal, 2007',
+    },
   },
   {
     id: 'w2',
     week: 2,
     title: 'Week 2',
-    brief: "Pip's phone is also their alarm. Pip is also very good at 'just one more video'.",
+    topic: { name: 'Sleep', icon: 'clock' },
+    brief: "Your phone is also your alarm. You are also very good at 'just one more video'.",
     twist: null,
     moves: 3,
     layout: {
@@ -46,12 +57,18 @@ SYL.LEVELS = [
       { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
       { type: 'alarm', label: 'Alarm in the bedroom' },
     ],
+    tip: {
+      do: 'Charge your phone outside the bedroom and use a cheap alarm clock. Put a book on the nightstand instead.',
+      why: 'Phone use in bed is linked to later, poorer sleep. And people who sleep less eat about 385 kcal more the next day.',
+      src: 'Exelmans & Van den Bulck, 2016 · Al Khatib et al., 2017',
+    },
   },
   {
     id: 'w3',
     week: 3,
     title: 'Week 3',
-    brief: 'Rough day at work. Pip is wiped out. Resting counts.',
+    topic: { name: 'Food', icon: 'meal' },
+    brief: 'Rough day at work. You are wiped out. Resting counts, but dinner matters.',
     twist: { id: 'rough', label: 'Rough day', desc: 'Rest +2, Run -2, Snack +1', mods: { rest: 2, run: -2, snack: 1 } },
     moves: 3,
     layout: {
@@ -71,11 +88,17 @@ SYL.LEVELS = [
       { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
       { type: 'alarm', label: 'Alarm in the bedroom' },
     ],
+    tip: {
+      do: 'Cook or prep a proper meal ahead and keep it at eye level. Put the snacks in a cupboard, or stop buying them.',
+      why: 'What is visible and within reach shapes what we eat. Changing your space beats relying on intentions.',
+      src: 'Hollands et al., Cochrane Review, 2019',
+    },
   },
   {
     id: 'w4',
     week: 4,
     title: 'Week 4',
+    topic: { name: 'Make it fun', icon: 'headphones' },
     brief: 'Raining. Running in the rain is miserable... unless there is a good podcast.',
     twist: { id: 'rain', label: 'Raining', desc: 'Run -3 (cancelled by headphones in the same room)', mods: { run: -3 }, cancel: { action: 'run', object: 'headphones' } },
     moves: 3,
@@ -96,13 +119,80 @@ SYL.LEVELS = [
       { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
       { type: 'alarm', label: 'Alarm in the bedroom' },
     ],
+    tip: {
+      do: 'Save a podcast, audiobook or playlist you love for exercise only. Pair the hard thing with the fun thing.',
+      why: 'Temptation bundling, pairing exercise with something enjoyable, increased gym visits by up to 51% in a study.',
+      src: 'Milkman, Minson & Volpp, 2014',
+    },
   },
   {
     id: 'w5',
     week: 5,
     title: 'Week 5',
-    brief: 'Overtime. Pip gets home at 20:00, too tired to even look at the kitchen. Straight to the couch.',
-    twist: { id: 'overtime', label: 'Overtime', desc: 'Home at 20:00 · skips the kitchen', mods: {}, start: 20 * 60, skip: ['kitchen'], skipReason: 'Too tired for the kitchen' },
+    topic: { name: 'Focus', icon: 'laptop' },
+    brief: 'Applications for a better job close tomorrow. Your portfolio needs one hour of real focus tonight.',
+    twist: { id: 'deadline', label: 'Deadline stress', desc: 'Scroll +1', mods: { scroll: 1 } },
+    moves: 3,
+    layout: {
+      phone: 'table',
+      shoes: 'shoe_rack',
+      meal: 'cupboard',
+      blanket: 'couch',
+      book: 'bedside',
+      clock: 'hall_table',
+      laptop: 'closet',
+    },
+    locked: [],
+    goals: [
+      { type: 'did', action: 'focus', label: 'An hour on the project' },
+      { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
+      { type: 'alarm', label: 'Alarm in the bedroom' },
+    ],
+    tip: {
+      do: 'Before work that matters, put your phone in another room and batch your notifications. One task, one block of time.',
+      why: 'Interruptions and task switching leave "attention residue" that drags down focus on the next task.',
+      src: 'Leroy, 2009 · Mark, Gudith & Klocke, 2008',
+    },
+  },
+  {
+    id: 'w6',
+    week: 6,
+    title: 'Week 6',
+    topic: { name: 'Friends', icon: 'postcard' },
+    brief: "A postcard from Maya: 'you still alive? call me x'. You haven't replied to her since March.",
+    twist: { id: 'lonely', label: 'Lonely week', desc: 'Scroll +1', mods: { scroll: 1 } },
+    moves: 3,
+    layout: {
+      phone: 'couch',
+      shoes: 'shoe_rack',
+      headphones: 'dresser',
+      snacks: 'counter',
+      meal: 'table',
+      blanket: 'closet',
+      book: 'hall_table',
+      clock: 'bedside',
+      postcard: 'drawer',
+    },
+    locked: [],
+    goals: [
+      { type: 'did', action: 'call', label: 'Call Maya' },
+      { type: 'did', action: 'eat', label: 'Eat a proper dinner' },
+      { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
+      { type: 'alarm', label: 'Alarm in the bedroom' },
+    ],
+    tip: {
+      do: 'Put a reminder of someone you miss where you sit in the evening. When you reach for your phone, call instead of scrolling.',
+      why: 'Strong social relationships were linked to about 50% higher odds of survival across 148 studies. Friendship grows with hours together: about 50 to become casual friends.',
+      src: 'Holt-Lunstad et al., 2010 · Hall, 2019',
+    },
+  },
+  {
+    id: 'w7',
+    week: 7,
+    title: 'Week 7',
+    topic: { name: 'Hard days', icon: 'blanket' },
+    brief: 'You pulled a late shift. Home at 20:00, too tired to even look at the kitchen. Straight to the couch.',
+    twist: { id: 'overtime', label: 'Late shift', desc: 'Home at 20:00 · skips the kitchen', mods: {}, start: 20 * 60, skip: ['kitchen'], skipReason: 'Too tired for the kitchen' },
     moves: 2,
     layout: {
       phone: 'drawer',
@@ -121,5 +211,10 @@ SYL.LEVELS = [
       { type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
       { type: 'alarm', label: 'Alarm in the bedroom' },
     ],
+    tip: {
+      do: "Plan for bad days in advance with an if-then plan: 'When I get home late, I eat the meal I prepped.' On hard days, rest counts.",
+      why: 'If-then plans had a medium-to-large effect on reaching goals across 94 studies. Missing a day did not reset a habit.',
+      src: 'Gollwitzer & Sheeran, 2006 · Lally et al., 2010',
+    },
   },
 ];

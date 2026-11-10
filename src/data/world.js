@@ -3,7 +3,7 @@
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
 SYL.WORLD = {
-  // Pip's route through the evening, in order. x = waypoint position (room coords).
+  // Your route through the evening, in order. x = waypoint position (room coords).
   zones: [
     { id: 'door', label: 'Front door', x0: 40, x1: 200, wx: 120 },
     { id: 'hall', label: 'Hallway', x0: 200, x1: 420, wx: 310 },
@@ -15,24 +15,26 @@ SYL.WORLD = {
   // Slots objects can sit in. kind: 'open' (full pull), 'far' (half pull),
   // 'hidden' (out of sight: almost no pull, never reaches other rooms).
   slots: [
-    { id: 'door_hook', zone: 'door', label: 'Hook', x: 90, y: 210, kind: 'open' },
-    { id: 'shoe_rack', zone: 'door', label: 'Shoe rack', x: 150, y: 380, kind: 'open' },
-    { id: 'hall_table', zone: 'hall', label: 'Hall table', x: 270, y: 210, kind: 'open' },
-    { id: 'closet', zone: 'hall', label: 'Closet', x: 360, y: 340, kind: 'hidden' },
-    { id: 'counter', zone: 'kitchen', label: 'Counter', x: 490, y: 210, kind: 'open' },
-    { id: 'table', zone: 'kitchen', label: 'Table', x: 600, y: 370, kind: 'open' },
-    { id: 'cupboard', zone: 'kitchen', label: 'Cupboard', x: 630, y: 180, kind: 'hidden' },
-    { id: 'coffee_table', zone: 'living', label: 'Coffee table', x: 770, y: 370, kind: 'open' },
-    { id: 'couch', zone: 'living', label: 'Couch', x: 890, y: 230, kind: 'open' },
-    { id: 'bedside', zone: 'bedroom', label: 'Bedside', x: 1040, y: 250, kind: 'open' },
-    { id: 'dresser', zone: 'bedroom', label: 'Dresser (far)', x: 1190, y: 390, kind: 'far' },
-    { id: 'drawer', zone: 'bedroom', label: 'Drawer', x: 1180, y: 180, kind: 'hidden' },
+    // no: objects that make no sense there (food on a coat hook...)
+    { id: 'door_hook', zone: 'door', label: 'Hook', x: 160, y: 214, kind: 'open', no: ['snacks', 'meal', 'laptop', 'book'] },
+    { id: 'shoe_rack', zone: 'door', label: 'Shoe rack', x: 156, y: 392, kind: 'open', no: ['snacks', 'meal', 'laptop'] },
+    { id: 'hall_table', zone: 'hall', label: 'Hall table', x: 270, y: 360, kind: 'open' },
+    { id: 'closet', zone: 'hall', label: 'Closet', x: 366, y: 300, kind: 'hidden' },
+    { id: 'counter', zone: 'kitchen', label: 'Counter', x: 492, y: 360, kind: 'open' },
+    { id: 'table', zone: 'kitchen', label: 'Table', x: 620, y: 362, kind: 'open' },
+    { id: 'cupboard', zone: 'kitchen', label: 'Cupboard', x: 492, y: 205, kind: 'hidden' },
+    { id: 'coffee_table', zone: 'living', label: 'Coffee table', x: 745, y: 388, kind: 'open' },
+    { id: 'couch', zone: 'living', label: 'Couch', x: 870, y: 350, kind: 'open' },
+    { id: 'bedside', zone: 'bedroom', label: 'Bedside', x: 1005, y: 364, kind: 'open' },
+    { id: 'dresser', zone: 'bedroom', label: 'Dresser (far)', x: 1201, y: 286, kind: 'far' },
+    { id: 'drawer', zone: 'bedroom', label: 'Drawer', x: 1201, y: 396, kind: 'hidden' },
   ],
 
   // cue: how strongly the object pulls towards each action (before reach).
   // cat: colour family for the SHIFT view. good = healthy, trap = pulls you off track, rest = recovery.
   objects: {
-    phone: { label: 'Phone', short: 'PH', cat: 'trap', cue: { scroll: 4 }, alarm: true },
+    // The phone also drags down focus wherever it can reach (notifications, switching).
+    phone: { label: 'Phone', short: 'PH', cat: 'trap', cue: { scroll: 4, focus: -2 }, alarm: true },
     shoes: { label: 'Running shoes', short: 'SH', cat: 'good', cue: { run: 4 } },
     headphones: { label: 'Headphones', short: 'HP', cat: 'good', cue: { run: 2 } },
     snacks: { label: 'Snack jar', short: 'SN', cat: 'trap', cue: { snack: 5 } },
@@ -40,9 +42,11 @@ SYL.WORLD = {
     blanket: { label: 'Blanket', short: 'BL', cat: 'rest', cue: { rest: 4 } },
     book: { label: 'Book', short: 'BK', cat: 'rest', cue: { read: 5 } },
     clock: { label: 'Alarm clock', short: 'AC', cat: 'good', cue: {}, alarm: true },
+    laptop: { label: 'Laptop', short: 'LT', cat: 'good', cue: { focus: 4 } },
+    postcard: { label: "Maya's postcard", short: 'PC', cat: 'good', cue: { call: 4 } },
   },
 
-  // Actions. zones: where Pip can do it. mins: how long it takes.
+  // Actions. zones: where you can do it. mins: how long it takes.
   // base: built-in pull. once: can only happen once per evening.
   // needs: only possible if that object reaches the room (no shoes, no run).
   actions: {
@@ -51,6 +55,8 @@ SYL.WORLD = {
     scroll: { label: 'Scroll phone', short: 'Scroll', verb: 'Scrolling', zones: ['door', 'hall', 'kitchen', 'living'], mins: 75, base: 1, needs: 'phone' },
     eat: { label: 'Eat a proper dinner', short: 'Dinner', verb: 'Eating dinner', zones: ['kitchen', 'living'], mins: 40, base: 0, once: true, needs: 'meal' },
     snack: { label: 'Snack', short: 'Snack', verb: 'Snacking', zones: ['kitchen', 'living'], mins: 20, base: 0.5, once: true, needs: 'snacks' },
+    focus: { label: 'Work on the project', short: 'Project', verb: 'Focusing on the project', zones: ['kitchen', 'living'], mins: 60, base: 0, once: true, needs: 'laptop' },
+    call: { label: 'Call Maya', short: 'Call Maya', verb: 'Catching up with Maya', zones: ['hall', 'kitchen', 'living'], mins: 45, base: 0, once: true, needs: 'postcard' },
     rest: { label: 'Rest on the couch', short: 'Rest', verb: 'Resting', zones: ['living'], mins: 60, base: 0.5, once: true },
     // Bedtime decision (bedroom only)
     read: { label: 'Read in bed', short: 'Read', verb: 'Reading', zones: ['bedroom'], mins: 20, base: 0, needs: 'book' },
@@ -59,12 +65,12 @@ SYL.WORLD = {
   },
 
   // Tie-break order (earlier wins a tie).
-  priority: ['carry', 'sleep', 'eat', 'run', 'read', 'rest', 'snack', 'scroll', 'bedscroll'],
+  priority: ['carry', 'sleep', 'eat', 'run', 'focus', 'call', 'read', 'rest', 'snack', 'scroll', 'bedscroll'],
 
   walkMins: 10, // between waypoints
-  bedtime: 22 * 60 + 30, // Pip heads to bed at 22:30 (or later if busy)
+  bedtime: 22 * 60 + 30, // you head to bed at 22:30 (or later if busy)
   habitWeight: 2,
   reach: { same: 1, adjacent: 0.4, far: 0.5, hidden: 0.1 },
 
-  startHabits: { scroll: 0.5, snack: 0.4, rest: 0.3, run: 0, eat: 0.1, read: 0 },
+  startHabits: { scroll: 0.5, snack: 0.4, rest: 0.3, run: 0, eat: 0.1, read: 0, focus: 0, call: 0 },
 };
