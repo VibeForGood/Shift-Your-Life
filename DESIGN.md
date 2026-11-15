@@ -65,19 +65,19 @@ Your route through the evening (waypoints = decision points):
    18:00                                                                    asleep?
 ```
 
-Each waypoint has **1–2 slots** (≈ 9 slots total). Objects can only sit in slots.
+Each waypoint has **2–3 slots** (12 total). Objects can only sit in slots.
 
 | Zone | Slots |
 |---|---|
-| Front door | door hook, shoe rack |
-| Hallway | hall table |
-| Kitchen | counter, fridge-top (hidden) |
+| Front door | hook, shoe rack |
+| Hallway | hall table, closet (hidden) |
+| Kitchen | counter, table, cupboard (hidden) |
 | Living room | coffee table, couch |
-| Bedroom | bedside table, drawer (hidden) |
+| Bedroom | bedside, dresser (far), drawer (hidden) |
 
-"Hidden" slots (fridge-top, drawer) are out of sight: objects there give **almost no pull**. That's the "out of sight, out of mind" tool, and storing something there still costs a move.
+"Hidden" slots (closet, cupboard, drawer) are out of sight: objects there give **almost no pull**. That's the "out of sight, out of mind" tool, and storing something there still costs a move. The **far** dresser gives half pull.
 
-### 5.2 Objects (jam build: 8)
+### 5.2 Objects (jam build: 10)
 
 | Object | Pulls towards | Notes / conflicts |
 |---|---|---|
@@ -85,14 +85,16 @@ Each waypoint has **1–2 slots** (≈ 9 slots total). Objects can only sit in s
 | Running shoes | **Run** | Strongest at the front door. |
 | Headphones | boosts **Run** | Temptation bundling: only matters next to the shoes. Rain twist cancels its effect without them. |
 | Snack jar | **Snack** (strong) | |
-| Fruit bowl | **Eat well** | Only one counter slot: fruit or snacks. |
+| Prepped meal | **Eat a proper dinner** | Competes with the snack jar for the kitchen. |
 | Blanket | **Rest** | Rest is a *valid* win on tired days, a trap on normal days. |
 | Book | **Read** → helps **Sleep** | Good bedside competitor to the phone. |
-| Alarm clock | frees the phone | Unlocked in Week 3. Solves the alarm conflict, but costs a move. |
+| Alarm clock | frees the phone | Solves the alarm conflict, but costs a move. |
+| Laptop | **Work on the project** | The phone's reach *lowers* Focus by 2. |
+| Maya's postcard | **Call Maya** | |
 
 ### 5.3 Actions
 
-`Run`, `Scroll`, `Snack`, `Eat well`, `Rest`, `Read`, `Sleep`, plus `Carry on` (do nothing, walk to the next waypoint).
+`Run`, `Scroll`, `Snack`, `Eat a proper dinner`, `Work on the project`, `Call Maya`, `Rest`, `Read`, `Scroll in bed`, `Sleep`, plus `Carry on` (do nothing, walk to the next waypoint).
 
 Each action takes in-game time (e.g. Run 60 min, Scroll 90 min, Eat 30 min). Being asleep by the goal time is a natural consequence of what happened earlier.
 
@@ -108,7 +110,7 @@ score(action) = baseline(action)
               + momentum(action)            // stretch: what-the-hell effect
 ```
 
-- `reach` = 1.0 same zone, 0.4 adjacent zone, 0.1 hidden slot, 0 otherwise.
+- `reach` = 1.0 same zone, 0.5 far slot, 0.4 adjacent zone, 0.1 hidden slot (own room only), 0 otherwise.
 - `Carry on` has a fixed baseline, so weak cues don't trigger anything.
 - Highest score wins. Ties break by a fixed priority list.
 - **Same setup → same result, always.** Variety comes from the week's twist, shown before planning.
@@ -143,8 +145,9 @@ Hold SHIFT during planning (and during the run, paused):
 ### 5.7 Decision bubble (readability)
 
 At each decision during the run: time slows to ~0.3×, a bubble over you shows
-the top 2–3 competing actions as bars with object icons, the winner flashes,
-You react. The player should always be able to answer "why did that happen?"
+the top 2–3 competing actions with object icons. Each row has the action and its
+score, the breakdown of what added to it on its own line (e.g. *Phone +4.0 ·
+Habit +1.0*), and a bar. The winner flashes and you react. The player should always be able to answer "why did that happen?"
 without reading a sentence.
 
 ### 5.8 Stars
@@ -206,10 +209,10 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 ## 8. Scope
 
 **Must ship**
-- Room, route, slots, 8 objects, drag-and-drop, move counter, undo
+- Room, route, slots, 10 objects, drag-and-drop (mouse and touch), move counter, undo
 - Deterministic sim + decision bubble
 - SHIFT view
-- 5 levels, goals, stars, retry, habit carry-over
+- 7 weeks, goals, stars, retry, habit carry-over
 - Speed toggle
 - Title, result and ending screens
 - Sound effects + one music loop (Audio is a judged category)
@@ -230,29 +233,33 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 - **Audio:** sound effects and the music loop are synthesised in code with the Web Audio API (`src/audio.js`). No files, nothing to license.
 - **Simulation separate from rendering:** `sim.js` is pure logic (no Phaser), so it can run headless in Node.
 - **Level checker:** a Node script brute-forces every arrangement within each week's move limit to confirm each level is **solvable**, and **not solvable with zero moves** or by one obvious move. Run it after every balance change.
-- **Testing:** Playwright (pre-installed) loads the game, plays scripted runs, and takes screenshots so bugs are caught before you see them.
+- **Testing:** Playwright loads the game, plays scripted runs, and takes screenshots so bugs are caught before you see them. Install it once with `npm install -g playwright && npx playwright install chromium`.
 
 ```
 /index.html
 /src/
   main.js            Phaser config, scene list
-  data/objects.js    objects, cue values
-  data/levels.js     weeks, twists, goals, starting layouts
-  sim.js             pure decision/time simulation
-  scenes/Title.js  Plan.js  Run.js  Result.js  Ending.js
-  ui/                bubble, SHIFT overlay, buttons
-  audio.js           ZzFX sound definitions
+  data/world.js      rooms, slots, objects, actions, all balance numbers
+  data/levels.js     weeks, twists, goals, starting layouts, tips
+  sim.js             pure decision/time simulation (no Phaser)
+  health.js          weekly weigh-ins, day-49 retest
+  research.js        research lines for result cards
+  art.js             all art, drawn in code
+  audio.js           synthesised sound effects and music
+  ui.js              colours, buttons, text helpers
+  scenes/Title.js  Story.js  Play.js  Ending.js
 /lib/phaser.min.js
 /tools/check-levels.js   brute-force solvability checker (Node)
-/tests/                  Playwright smoke tests + screenshots
+/tests/                  Playwright smoke test + screenshots
 ```
 
 The blank GameMaker project is removed at the start of Milestone 1 (it stays in
 git history). If we ever port to GameMaker, the data files and `sim.js` translate
 almost line for line.
 
-**Publishing:** zip the repo's game files → itch.io "HTML" project, "played in
-the browser", 1280×720 viewport with fullscreen button. Optionally also GitHub Pages.
+**Publishing:** `git archive --format=zip -o dist/shift-your-life.zip HEAD index.html lib src`
+→ itch.io "HTML" project, "played in the browser", 1280×720 viewport, mobile
+friendly (landscape), fullscreen button. Full steps in `ITCH_PAGE.md`. Optionally also GitHub Pages.
 
 ## 10. Milestones
 

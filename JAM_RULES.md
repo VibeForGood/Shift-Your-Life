@@ -14,7 +14,7 @@ Jam theme: **SHIFT**
 | # | Rule | What it means for this project |
 |---|------|--------------------------------|
 | 1 | **Start the game during the jam.** Templates, libraries and reusable code are fine, but the vast majority of development must happen in the submission period. | The project was a blank GameMaker template at jam start. Build everything during November. Do not import an old game. |
-| 2 | **Source code in a public GitHub repo.** Any licence is allowed. | `cragoon/shift-your-life` must be **public** before the deadline. Add a `LICENSE` file (code and assets may be licensed separately). |
+| 2 | **Source code in a public GitHub repo.** Any licence is allowed. | `VibeForGood/Shift-Your-Life` must be **public** before the deadline. Add a `LICENSE` file (code and assets may be licensed separately). |
 | 3 | **Any tools are allowed.** Any engine, language, assets or dev tools. | We're using Phaser 3 (browser). |
 | 4 | **Solo or team**, no size limit, multiple games allowed. | — |
 | 5 | **AI is allowed, but must be disclosed** when submitting. | Keep a running record of AI use (see "AI usage log" below) so the disclosure is accurate. |
@@ -127,9 +127,10 @@ Keep this updated so the itch.io AI disclosure is accurate.
 | 2026-11-04 | Claude Code | Brainstorming the game concept, synthesising peer-review feedback into a design plan, formatting this rules file. |
 | 2026-11-04 | Claude Code | Writing the design document (DESIGN.md). |
 | 2026-11-04 | Claude Code | Milestone 1: all game code (Phaser scenes, simulation, level data), level checker and smoke test. |
+| 2026-11-04 | Copilot SDK in VS Code | Independent review of the game design, implementation, balance checks and submission readiness. |
 | 2026-11-09 | Claude Code | Design review; synthesised sound effects and music loop (`src/audio.js`); themed title screen; Week 5 renamed "Late shift"; itch.io page draft (ITCH_PAGE.md). |
 | 2026-11-09 | Claude Code | Art pass (`src/art.js`): code-drawn object icons, furnished apartment, Pip expressions and animations, evening lighting, particles. |
 | 2026-11-10 | Claude Code | Story rework: human main character from Momentum, intro story scene, Focus and Friends weeks, week cards, "Try this in your life" tips, Dr Reyes ending, slot restrictions. |
 | 2026-11-10 | Claude Code | Health model (`src/health.js`): weekly weigh-ins and the day-49 retest ending; clearer Diabetes Prevention Program intro card. |
-| 2026-11-04 | Copilot SDK in VS Code | Independent review of the game design, implementation, balance checks and submission readiness. |
 | 2026-11-15 | Claude Code | Decision popup layout fix: effect breakdown on its own wrapped line so it no longer overlaps the activity title. |
+| 2026-11-15 | Claude Code | Phone/tablet touch testing, itch.io build zip, and updating the .md docs to match the current game. |

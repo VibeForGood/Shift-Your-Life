@@ -34,12 +34,12 @@ Seven weeks. Every result is explained, and the ending hands you your own shift 
 
 | | |
 |---|---|
-| Drag | Move an object to another spot |
-| Hold **SHIFT** (or the **Pulls** button) | Show what each object pulls you towards |
+| Drag (mouse or finger) | Move an object to another spot |
+| Hold **SHIFT** (or tap **Pulls**) | Show what each object pulls you towards |
 | **Run evening** | Play out your evening |
-| **M** | Mute |
+| **M** (or tap **Sound**) | Mute |
 
-Mouse or touch. Plays in the browser, about 20 minutes.
+Mouse or touch. Plays in the browser on desktop, tablet or phone (turn your phone sideways). About 20 minutes.
 
 ### About the theme
 
@@ -55,11 +55,18 @@ behaviour follows.
 - Code: written with Claude Code (AI-assisted, disclosed)
 - Engine: Phaser 3 (MIT)
 - Sound and music: synthesised in code, no samples
-- Source: https://github.com/cragoon/shift-your-life
+- Source: https://github.com/VibeForGood/Shift-Your-Life
 
 *Not medical advice. Research sources are listed in the repo.*
 
 ---
+
+**Upload settings:**
+- Kind of project: **HTML**. Upload `dist/shift-your-life.zip` (build it with the
+  `git archive` command in the README) and tick **This file will be played in the browser**.
+- Viewport: **1280 × 720**. Tick **Mobile friendly**, orientation **Landscape**,
+  and **Fullscreen button**.
+- Play the page once after saving to check it loads.
 
 **Suggested tags:** puzzle, casual, cozy, short, habits, minimalist, singleplayer
 **Genre:** Puzzle

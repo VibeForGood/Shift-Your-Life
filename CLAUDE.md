@@ -14,6 +14,10 @@ Browser game (Phaser 3, plain JS, no build step) for **GitHub Game Off 2026**
   solvable, none solvable with zero moves) and
   `NODE_PATH=$(npm root -g) node tests/smoke.js` (headless play-through, no
   JS errors). Look at the screenshots in `tests/screenshots/` after visual changes.
+  Playwright isn't bundled: `npm install -g playwright && npx playwright install chromium`.
+- **itch.io build:** `git archive --format=zip -o dist/shift-your-life.zip HEAD index.html lib src`
+  (never PowerShell `Compress-Archive`: backslash paths break on itch). Must work
+  with touch on phones and tablets, not just mouse and keyboard.
 - **Balance:** all numbers live in `src/data/world.js` and `src/data/levels.js`.
   `src/sim.js` must stay free of Phaser so the checker can run it in Node.
 - **Research:** `SelfImprovement_Research.md` holds the self-help techniques
