@@ -11,23 +11,26 @@ SYL.TitleScene = class extends Phaser.Scene {
     this.add.ellipse(640, 500, 760, 70, 0xe9dfcf);
     SYL.audio.startMusic(); // begins on the first click/key (browser rule)
 
+    // Three beats of the theme: two small lines lead in, the title lands last.
+    ['Shift the room.', 'Shift the habits.'].forEach((line, i) => {
+      var t = SYL.text(this, 640, 124 + i * 34, line, 26, C.inkSoft).setOrigin(0.5).setAlpha(0);
+      this.tweens.add({ targets: t, alpha: 1, x: { from: 620, to: 640 }, duration: 400, delay: 300 + i * 450, ease: 'Quad.out' });
+    });
+
     // Title: "Shift" slides sideways now and then, the rest stays put.
+    var titleY = 186;
     var shiftWord = SYL.text(this, 0, 0, 'Shift', 84, C.ink, { fontStyle: 'bold' });
     var rest = SYL.text(this, 0, 0, ' Your Life', 84, C.ink, { fontStyle: 'bold' });
     var total = shiftWord.width + rest.width;
     var x0 = 640 - total / 2;
-    shiftWord.setPosition(x0, 120);
-    rest.setPosition(x0 + shiftWord.width, 120);
+    shiftWord.setPosition(x0, titleY);
+    rest.setPosition(x0 + shiftWord.width, titleY);
+    [shiftWord, rest].forEach((t) => t.setAlpha(0));
+    this.tweens.add({ targets: [shiftWord, rest], alpha: 1, y: { from: titleY + 12, to: titleY }, duration: 500, delay: 1200, ease: 'Back.out' });
     this.time.addEvent({
       delay: 3200, loop: true, callback: () => {
         this.tweens.add({ targets: shiftWord, x: x0 - 18, duration: 140, yoyo: true, ease: 'Quad.out' });
       },
-    });
-
-    // Three beats of the theme, one after another.
-    ['Shift the room.', 'Shift the habits.', 'Shift your life.'].forEach((line, i) => {
-      var t = SYL.text(this, 640, 238 + i * 34, line, 26, i === 2 ? C.ink : C.inkSoft, { fontStyle: i === 2 ? 'bold' : 'normal' }).setOrigin(0.5).setAlpha(0);
-      this.tweens.add({ targets: t, alpha: 1, x: { from: 620, to: 640 }, duration: 400, delay: 300 + i * 450, ease: 'Quad.out' });
     });
 
     // You, with three objects around you. Hold SHIFT to see the pulls.

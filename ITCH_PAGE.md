@@ -9,9 +9,9 @@ You can't make yourself do anything. You can only shift what's around you.
 
 ---
 
-## Shift Your Life
+*Shift the room. Shift the habits.*
 
-**Shift the room. Shift the habits. Shift your life.**
+## Shift Your Life
 
 You're 34. You sleep five hours with your phone, dinner comes in a paper bag, and
 you haven't answered your oldest friend since March. On Monday, Dr Reyes reads out
