@@ -7,5 +7,5 @@ SYL.game = new Phaser.Game({
   height: 720,
   backgroundColor: SYL.hex(SYL.C.bg),
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [SYL.TitleScene, SYL.PlayScene, SYL.EndingScene],
+  scene: [SYL.TitleScene, SYL.StoryScene, SYL.PlayScene, SYL.EndingScene],
 });

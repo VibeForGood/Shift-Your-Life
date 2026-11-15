@@ -31,7 +31,7 @@ function* arrangements(level) {
     if (displaced >= level.moves || level.locked.indexOf(o) >= 0) return;
     var start = level.layout[o];
     for (var s of slots) {
-      if (s === start) continue;
+      if (s === start || !SYL.sim.allowed(o, s)) continue;
       cur[o] = s;
       yield* rec(i + 1, displaced + 1);
     }
