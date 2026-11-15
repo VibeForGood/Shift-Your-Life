@@ -443,9 +443,17 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     async showDecision(e) {
       var opts = e.options.slice(0, 3);
       var maxScore = Math.max.apply(null, opts.map((o) => o.score).concat([1]));
-      var bw = 300, rowH = 46, bh = 24 + opts.length * rowH;
+      // Each row: [icon] Title ........ score / effect breakdown (own line, wraps) / score bar.
+      var bw = 340, pad = 12, rowGap = 10;
+      var rowsData = opts.map((o) => {
+        var topSrc = o.sources.filter((s) => s.kind === 'object').sort((a2, b2) => b2.amount - a2.amount)[0];
+        var why = o.sources.filter((s) => s.amount !== 0).map((s) => s.label + (s.amount > 0 ? ' +' : ' ') + s.amount.toFixed(1)).join('  ·  ');
+        var whyT = SYL.text(this, -bw / 2 + pad, 0, why, 12, C.inkSoft, { wordWrap: { width: bw - pad * 2 }, lineSpacing: 2 });
+        return { o: o, topSrc: topSrc, whyT: whyT, h: 22 + (why ? whyT.height + 4 : 0) + 12 };
+      });
+      var bh = pad * 2 + rowsData.reduce((n, r) => n + r.h, 0) + rowGap * (rowsData.length - 1);
       var bx = Phaser.Math.Clamp(this.pip.x, 40 + bw / 2, 1240 - bw / 2);
-      var by = this.pip.y + this.pipArt.top - 24 - bh;
+      var by = Math.max(8, this.pip.y + this.pipArt.top - 24 - bh);
       var b = this.add.container(bx, by).setDepth(35).setScale(0.6).setAlpha(0);
       var g = this.add.graphics();
       g.fillStyle(0x000000, 0.18).fillRoundedRect(-bw / 2, 4, bw, bh, 14);
@@ -453,19 +461,21 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       g.fillTriangle(this.pip.x - bx - 10, bh, this.pip.x - bx + 10, bh, this.pip.x - bx, bh + 14);
       b.add(g);
       var rows = [];
-      opts.forEach((o, i) => {
-        var y = 12 + i * rowH;
+      var y = pad;
+      rowsData.forEach((r, i) => {
+        var o = r.o, topSrc = r.topSrc;
         var col = ACTION_COLOR[o.action] || C.inkSoft;
-        var topSrc = o.sources.filter((s) => s.kind === 'object').sort((a2, b2) => b2.amount - a2.amount)[0];
-        if (topSrc) b.add(this.add.image(-bw / 2 + 22, y + 9, 'icon_' + topSrc.obj).setScale(0.36));
-        var name = SYL.text(this, -bw / 2 + (topSrc ? 40 : 12), y, W.actions[o.action].label, 15, C.ink, { fontStyle: 'bold' });
-        var barBg = this.add.rectangle(-bw / 2 + 12, y + 24, bw - 70, 10, C.line).setOrigin(0, 0.5);
-        var bar = this.add.rectangle(-bw / 2 + 12, y + 24, 0, 10, col).setOrigin(0, 0.5);
-        var val = SYL.text(this, bw / 2 - 12, y + 24, o.score.toFixed(1), 14, C.inkSoft).setOrigin(1, 0.5);
-        var why = o.sources.filter((s) => s.amount !== 0).map((s) => s.label + (s.amount > 0 ? ' +' : ' ') + s.amount.toFixed(1)).join(' · ');
-        var whyT = SYL.text(this, bw / 2 - 12, y, why, 11, C.inkSoft).setOrigin(1, 0);
-        b.add([name, barBg, bar, val, whyT]);
-        rows.push({ o: o, bar: bar, name: name, w: (bw - 70) * Math.max(0, o.score) / maxScore });
+        if (i > 0) g.lineStyle(1, C.line, 1).lineBetween(-bw / 2 + pad, y - rowGap / 2, bw / 2 - pad, y - rowGap / 2);
+        if (topSrc) b.add(this.add.image(-bw / 2 + pad + 10, y + 9, 'icon_' + topSrc.obj).setScale(0.36));
+        var name = SYL.text(this, -bw / 2 + pad + (topSrc ? 28 : 0), y, W.actions[o.action].label, 15, C.ink, { fontStyle: 'bold' });
+        var val = SYL.text(this, bw / 2 - pad, y + 1, o.score.toFixed(1), 15, C.ink, { fontStyle: 'bold' }).setOrigin(1, 0);
+        var ry = y + 22;
+        if (r.whyT.text) { r.whyT.setY(ry); ry += r.whyT.height + 4; }
+        var barBg = this.add.rectangle(-bw / 2 + pad, ry + 4, bw - pad * 2, 8, C.line).setOrigin(0, 0.5);
+        var bar = this.add.rectangle(-bw / 2 + pad, ry + 4, 0, 8, col).setOrigin(0, 0.5);
+        b.add([name, val, r.whyT, barBg, bar]);
+        rows.push({ o: o, bar: bar, name: name, w: (bw - pad * 2) * Math.max(0, o.score) / maxScore });
+        y += r.h + rowGap;
       });
       SYL.audio.play('think');
       var top = e.options[0].sources.filter((s) => s.kind === 'object').sort((a, b) => b.amount - a.amount)[0];

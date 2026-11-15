@@ -132,3 +132,4 @@ Keep this updated so the itch.io AI disclosure is accurate.
 | 2026-11-10 | Claude Code | Story rework: human main character from Momentum, intro story scene, Focus and Friends weeks, week cards, "Try this in your life" tips, Dr Reyes ending, slot restrictions. |
 | 2026-11-10 | Claude Code | Health model (`src/health.js`): weekly weigh-ins and the day-49 retest ending; clearer Diabetes Prevention Program intro card. |
 | 2026-11-04 | Copilot SDK in VS Code | Independent review of the game design, implementation, balance checks and submission readiness. |
+| 2026-11-15 | Claude Code | Decision popup layout fix: effect breakdown on its own wrapped line so it no longer overlaps the activity title. |
