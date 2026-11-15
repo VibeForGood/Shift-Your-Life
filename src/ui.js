@@ -22,6 +22,10 @@ SYL.HABIT_ROWS = [
   ['focus', 'Focus', SYL.C.good, 'Focused work'], ['rest', 'Rest', SYL.C.rest, 'Resting'],
   ['call', 'Friends', SYL.C.good, 'Calling friends'], ['read', 'Read', SYL.C.rest, 'Reading in bed'],
 ];
+// Your weight right now: start weight plus every finished week.
+SYL.currentKg = function () {
+  return SYL.health.START.kg + SYL.state.healthWeeks.reduce(function (n, w) { return n + w.dKg; }, 0);
+};
 SYL.hex = function (n) { return '#' + n.toString(16).padStart(6, '0'); };
 SYL.FONT = '"Trebuchet MS", "Segoe UI", Arial, sans-serif';
 
@@ -76,10 +80,13 @@ SYL.state = {
   levelIndex: 0,
   habits: Object.assign({}, SYL.WORLD.startHabits),
   history: [],
+  healthWeeks: [],
   speed: 1,
   reset: function () {
     this.levelIndex = 0;
     this.habits = Object.assign({}, SYL.WORLD.startHabits);
     this.history = [];
+    this.healthWeeks = [];
+    this.briefSeen = {};
   },
 };
