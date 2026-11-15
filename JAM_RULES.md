@@ -34,7 +34,7 @@ voting ends.
 ## Submission checklist
 
 - [ ] Code (and any redistributable assets) pushed to the public GitHub repo **before** Dec 1, 13:37 PST.
-- [ ] `LICENSE` file in the repo.
+- [x] `LICENSE` file in the repo (MIT).
 - [ ] README with how to play, controls, platform, and credits/attribution for third-party assets or code.
 - [ ] README notes any paid/proprietary assets left out of the repo because their licence forbids redistribution (use placeholders).
 - [ ] Playable build uploaded to itch.io (a browser/HTML5 build is easiest for raters).

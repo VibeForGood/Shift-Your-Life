@@ -51,19 +51,21 @@ behaviour follows.
 
 ### Credits
 
-- Design and direction: cragoon
+- Design and direction: VibeForGood
 - Code: written with Claude Code (AI-assisted, disclosed)
 - Engine: Phaser 3 (MIT)
 - Sound and music: synthesised in code, no samples
-- Source: https://github.com/VibeForGood/Shift-Your-Life
+- Source: https://github.com/VibeForGood/Shift-Your-Life (MIT licence)
 
 *Not medical advice. Research sources are listed in the repo.*
 
 ---
 
 **Upload settings:**
-- Kind of project: **HTML**. Upload `dist/shift-your-life.zip` (build it with the
-  `git archive` command in the README) and tick **This file will be played in the browser**.
+- Kind of project: **HTML**. Commit first, then build the zip with
+  `git archive --format=zip -o dist/shift-your-life.zip HEAD index.html lib src`
+  (not Windows "Compress": its paths break on itch). Upload `dist/shift-your-life.zip`
+  and tick **This file will be played in the browser**.
 - Viewport: **1280 × 720**. Tick **Mobile friendly**, orientation **Landscape**,
   and **Fullscreen button**.
 - Play the page once after saving to check it loads.
