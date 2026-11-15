@@ -11,7 +11,7 @@ You can't make yourself do anything. You can only shift what's around you.
 
 ## Shift Your Life
 
-**Shift the room. Shift the habits. Survive the shift.**
+**Shift the room. Shift the habits. Shift your life.**
 
 You're 34. You sleep five hours with your phone, dinner comes in a paper bag, and
 you haven't answered your oldest friend since March. On Monday, Dr Reyes reads out
@@ -19,19 +19,7 @@ your blood results: prediabetes, high blood pressure. Follow-up in seven weeks.
 
 Willpower has never worked for you. So don't use it. Shift what's around you
 instead: running shoes by the door, the phone out of the bedroom, the snacks out
-of sight, the laptop away from the phone, a postcard from Maya where you sit. Then
-press **Run evening** and watch your habits live the night with the flat you gave them.
-
-- **Shift objects:** a few moves per week, a puzzle every evening
-- **Hold SHIFT:** see the invisible pull every object has on you
-- **Shift habits:** what you do this week makes it easier (or harder) next week
-- **Seven shifts:** move, sleep, food, fun, focus, friends and hard days
-- **Take it with you:** every week ends with one real thing to try in your own life, backed by research
-
-Seven weeks. Every result is explained, and the ending hands you your own shift list.
-
-The character is fictional, and the health figures are simplified illustrations,
-not personal predictions or medical advice.
+of sight.
 
 ### Controls
 

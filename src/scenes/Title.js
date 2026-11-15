@@ -25,7 +25,7 @@ SYL.TitleScene = class extends Phaser.Scene {
     });
 
     // Three beats of the theme, one after another.
-    ['Shift the room.', 'Shift the habits.', 'Survive the shift.'].forEach((line, i) => {
+    ['Shift the room.', 'Shift the habits.', 'Shift your life.'].forEach((line, i) => {
       var t = SYL.text(this, 640, 238 + i * 34, line, 26, i === 2 ? C.ink : C.inkSoft, { fontStyle: i === 2 ? 'bold' : 'normal' }).setOrigin(0.5).setAlpha(0);
       this.tweens.add({ targets: t, alpha: 1, x: { from: 620, to: 640 }, duration: 400, delay: 300 + i * 450, ease: 'Quad.out' });
     });
