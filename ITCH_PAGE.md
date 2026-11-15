@@ -30,6 +30,9 @@ press **Run evening** and watch your habits live the night with the flat you gav
 
 Seven weeks. Every result is explained, and the ending hands you your own shift list.
 
+The character is fictional, and the health figures are simplified illustrations,
+not personal predictions or medical advice.
+
 ### Controls
 
 | | |
@@ -52,7 +55,7 @@ behaviour follows.
 ### Credits
 
 - Design and direction: VibeForGood
-- Code: written with Claude Code (AI-assisted, disclosed)
+- Code: written with Claude Code (AI-assisted, disclosed); documentation also reviewed with Copilot SDK in VS Code
 - Engine: Phaser 3 (MIT)
 - Sound and music: synthesised in code, no samples
 - Source: https://github.com/VibeForGood/Shift-Your-Life (MIT licence)

@@ -1,7 +1,10 @@
 # Shift Your Life — Design Document
 
-GitHub Game Off 2026 · Theme: **SHIFT** · Solo dev + Claude (vibe coded)
-Rules: see `JAM_RULES.md`. Earlier versions of the idea: `../Momentum`, `../Momentum_Cards`. Deadline **Dec 1, 2026, 13:37 PST**. Target submit **Nov 28**.
+GitHub Game Off 2026 · Theme: **SHIFT** · Solo developer, AI-assisted
+
+Rules: see `JAM_RULES.md`. This design draws on ideas from earlier prototypes;
+none are required to play or build this game. Deadline **Dec 1, 2026, 13:37 PST**.
+Target submit **Nov 28**.
 
 ---
 
@@ -18,9 +21,9 @@ lifting. The player learns it by playing, because the only tool they have is the
 environment. **Every week ends with one concrete thing to try in real life**, and
 the ending hands the player their whole "shift list".
 
-**Tone:** dry humour, warm underneath. Weight and health are part of the story
-(as in Momentum, the earlier version of this idea): stated plainly by the doctor,
-backed by research, never a joke, never shaming. The character is drawn with care.
+**Tone:** dry humour, warm underneath. Weight and health are part of the story:
+stated plainly by the doctor, backed by research, never a joke, never shaming.
+The character is drawn with care.
 
 ## 2. Pillars
 
@@ -32,23 +35,26 @@ Anything that doesn't serve these three is a stretch goal or cut.
 
 ## 3. The character
 
-**You.** Thirty-four, claims analyst at Halcyon Insurance, a one-bed flat on Elm
-Street (carried over from Momentum). 118 kg, about five hours' sleep, takeaway most
+**You.** A fictional 34-year-old claims analyst at Halcyon Insurance, in a one-bed flat on Elm
+Street. 118 kg, about five hours' sleep, takeaway most
 nights, hasn't replied to Maya since March. On Monday Dr Reyes gives you your
 results: HbA1c 6.1% (prediabetes), blood pressure 142/91. Follow-up on day 49.
+
+The character and all personal health results are fictional. The game's health
+figures are simplified illustrations, not predictions or medical guidance.
 
 Second person throughout: *Shift Your Life*. The UI says "your habits", "you fell
 asleep at 22:30". The character's personality is in animation: tired eyes after
 scrolling, a victory hop after a run, a happy face on the phone to Maya.
 
-**Intro (Story scene):** seven short cards adapted from Momentum's opening: who you
+**Intro (Story scene):** seven short cards adapted from an earlier prototype: who you
 are, the small defaults, the blood results, the Diabetes Prevention Program (-58%),
 "don't rely on willpower", then the seven shifts and **Time to shift**. Skippable.
 
 ## 4. Core loop (≈ 2 min per attempt, instant retry)
 
 1. **Brief card** — "Week 3. Rough day at work. Goals: eat a proper dinner · asleep by 23:00."
-2. **Plan** — the room is shown as it is. Hold **SHIFT** to see pull lines. Drag up to **N** objects into slots. Undo freely; moves count only when you press Run.
+2. **Plan** — the room is shown as it is. Hold **SHIFT** to see pull lines. Drag objects into slots, up to **N** objects moved from their starting spots. The counter tracks changed objects; drag one back to its starting spot or use **Reset** to undo.
 3. **Run** — the evening plays from 18:00. You walk a fixed route. At each **decision point** time slows, a thought bubble shows the competing pulls as bars, the strongest wins, reacts, and the action plays out. Walking is fast. Speed toggle 1× / 2× / 4×.
 4. **Result** — goals ticked or crossed, stars, and one line of real research tied to what just happened. **Retry** (same week) or **Next week**.
 
@@ -96,7 +102,7 @@ Each waypoint has **2–3 slots** (12 total). Objects can only sit in slots.
 
 `Run`, `Scroll`, `Snack`, `Eat a proper dinner`, `Work on the project`, `Call Maya`, `Rest`, `Read`, `Scroll in bed`, `Sleep`, plus `Carry on` (do nothing, walk to the next waypoint).
 
-Each action takes in-game time (e.g. Run 60 min, Scroll 90 min, Eat 30 min). Being asleep by the goal time is a natural consequence of what happened earlier.
+Each action takes in-game time (e.g. Run 60 min, Scroll 75 min, Eat 40 min). Being asleep by the goal time is a natural consequence of what happened earlier.
 
 ### 5.4 The decision rule (deterministic)
 
@@ -153,7 +159,6 @@ without reading a sentence.
 ### 5.8 Stars
 
 - ★ per goal met.
-- ★ bonus: solved with fewer moves than allowed.
 Retry is instant; stars are the reason to retry.
 
 ## 6. Levels (7 weeks, one shift each)
@@ -177,7 +182,7 @@ sense there (no food or laptops on the coat hook or shoe rack).
 
 **Weekly weigh-in:** every result card turns that evening (the flat stays set up
 all week) into a weigh-in: what helped, what held you back, and the kg change.
-Model in `src/health.js`, formulas from Momentum's `scr_body`: old habits = +300
+Model in `src/health.js`, adapted from an earlier prototype: old habits = +300
 kcal/day; proper dinners -450, no snacking -200, asleep by 23:00 -275 (Al Khatib),
 running -210 and 150 active min; 7,700 kcal per kg; capped at -1 / +0.6 kg a week.
 Good play lands about -0.5 kg a week (the goal Dr Reyes sets); doing nothing gains.
@@ -209,7 +214,7 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 ## 8. Scope
 
 **Must ship**
-- Room, route, slots, 10 objects, drag-and-drop (mouse and touch), move counter, undo
+- Room, route, slots, 10 objects, drag-and-drop (mouse and touch), move counter and reset
 - Deterministic sim + decision bubble
 - SHIFT view
 - 7 weeks, goals, stars, retry, habit carry-over
@@ -253,20 +258,23 @@ Every number must be double-checked against `SelfImprovement_Research.md` before
 /tests/                  Playwright smoke test + screenshots
 ```
 
-The blank GameMaker project is removed at the start of Milestone 1 (it stays in
-git history). If we ever port to GameMaker, the data files and `sim.js` translate
-almost line for line.
+The early prototype started from a blank GameMaker project; it is not part of
+the current build. If the game is ever ported to GameMaker, the data files and
+`sim.js` should translate with little change.
 
 **Publishing:** `git archive --format=zip -o dist/shift-your-life.zip HEAD index.html lib src`
 → itch.io "HTML" project, "played in the browser", 1280×720 viewport, mobile
 friendly (landscape), fullscreen button. Full steps in `ITCH_PAGE.md`. Optionally also GitHub Pages.
 
-## 10. Milestones
+## 10. Original milestone schedule
+
+This was the planned schedule; the game ultimately grew to seven weeks. The
+dates below are targets, not a record of completion.
 
 | Dates | Milestone | Done when |
 |---|---|---|
 | Nov 5–8 | **M1 Greybox** | Boxes-and-circles room, drag/drop, sim runs, Week 1 playable, level checker works |
-| Nov 9–13 | **M2 Game** | Decision bubble, SHIFT view, all 5 weeks, habits, stars, retry. *Playable start to finish.* |
+| Nov 9–13 | **M2 Game** | Decision bubble, SHIFT view, all 7 weeks, habits, stars, retry. *Playable start to finish.* |
 | Nov 14–19 | **M3 Look & sound** | Art pass, character animations, sound effects, music, title/ending |
 | Nov 20–24 | **M4 Playtest** | Friends play it cold; fix confusion; balance; stretch goals if time |
 | Nov 25–28 | **M5 Ship** | README, LICENSE, credits, AI disclosure, itch page, screenshots, **submit Nov 28** |
@@ -278,5 +286,4 @@ After each push:
 - Pull the branch and double-click `index.html`, **or**
 - I'll set up GitHub Pages so every push is playable at a link.
 
-Tell me what felt confusing, boring or broken. That's the most valuable input
-you can give; I'll handle the code.
+Player feedback on what feels confusing, boring or broken is welcome.

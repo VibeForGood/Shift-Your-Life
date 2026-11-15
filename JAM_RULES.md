@@ -1,9 +1,9 @@
 # Game Off 2026 — Jam Rules
 
-Source: <https://itch.io/jam/game-off-2026> and the jam FAQ
-(<https://itch.io/jam/game-off-2026/topic/7290154/frequently-asked-questions-faq>).
-Copied from the official post by the project owner. If this file and the
-official page ever disagree, the official page wins.
+This is a project-specific summary of the official rules, not an official jam
+document. Check the [jam page](https://itch.io/jam/game-off-2026) and [FAQ](https://itch.io/jam/game-off-2026/topic/7290154/frequently-asked-questions-faq)
+for the current wording. If this summary and an official source ever disagree,
+the official source wins.
 
 Jam theme: **SHIFT**
 
@@ -130,7 +130,8 @@ Keep this updated so the itch.io AI disclosure is accurate.
 | 2026-11-04 | Copilot SDK in VS Code | Independent review of the game design, implementation, balance checks and submission readiness. |
 | 2026-11-09 | Claude Code | Design review; synthesised sound effects and music loop (`src/audio.js`); themed title screen; Week 5 renamed "Late shift"; itch.io page draft (ITCH_PAGE.md). |
 | 2026-11-09 | Claude Code | Art pass (`src/art.js`): code-drawn object icons, furnished apartment, Pip expressions and animations, evening lighting, particles. |
-| 2026-11-10 | Claude Code | Story rework: human main character from Momentum, intro story scene, Focus and Friends weeks, week cards, "Try this in your life" tips, Dr Reyes ending, slot restrictions. |
+| 2026-11-10 | Claude Code | Story rework: human main character from an earlier prototype, intro story scene, Focus and Friends weeks, week cards, "Try this in your life" tips, Dr Reyes ending, slot restrictions. |
 | 2026-11-10 | Claude Code | Health model (`src/health.js`): weekly weigh-ins and the day-49 retest ending; clearer Diabetes Prevention Program intro card. |
 | 2026-11-15 | Claude Code | Decision popup layout fix: effect breakdown on its own wrapped line so it no longer overlaps the activity title. |
 | 2026-11-15 | Claude Code | Phone/tablet touch testing, itch.io build zip, and updating the .md docs to match the current game. |
+| 2026-11-15 | Copilot SDK in VS Code | Reviewed Markdown files for public readability; aligned design notes and AI credits, and replaced copied FAQ text with a brief summary and official links. |

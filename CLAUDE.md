@@ -11,10 +11,12 @@ Browser game (Phaser 3, plain JS, no build step) for **GitHub Game Off 2026**
   assets, licensing, submission or deadlines. Follow it. The submission
   deadline is **Dec 1, 2026, 13:37 PST**.
 - **Checks before every push:** `node tools/check-levels.js` (all weeks
-  solvable, none solvable with zero moves) and
-  `NODE_PATH=$(npm root -g) node tests/smoke.js` (headless play-through, no
-  JS errors). Look at the screenshots in `tests/screenshots/` after visual changes.
-  Playwright isn't bundled: `npm install -g playwright && npx playwright install chromium`.
+  solvable, none solvable with zero moves) and a headless play-through with no
+  JS errors. Playwright isn't bundled: install it with
+  `npm install -g playwright`, then install Chromium with
+  `npx playwright install chromium`. Set `NODE_PATH` to `npm root -g` when
+  running `tests/smoke.js` so Node can find the global Playwright package.
+  Look at the screenshots in `tests/screenshots/` after visual changes.
 - **itch.io build:** `git archive --format=zip -o dist/shift-your-life.zip HEAD index.html lib src`
   (never PowerShell `Compress-Archive`: backslash paths break on itch). Must work
   with touch on phones and tablets, not just mouse and keyboard.

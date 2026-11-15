@@ -25,9 +25,9 @@ held upright. iPhones play no sound while the silent switch is on.
 - Built with [Phaser 3](https://phaser.io) (MIT, see `lib/PHASER_LICENSE.md`).
 - Sound effects and music are synthesised in code (`src/audio.js`). No audio files or samples.
 - All art is drawn in code (`src/art.js`). No image files.
-- Story and character adapted from the developer's earlier games *Momentum* and *Momentum Cards*.
+- The fictional story and character draw on ideas from the developer's earlier prototypes.
 - Research sources are listed in `SelfImprovement_Research.md`. This game is not medical advice.
-- Made with AI assistance (Claude Code). See the AI usage log in `JAM_RULES.md`.
+- Made with AI assistance, including Claude Code and Copilot SDK in VS Code. See the AI usage log in `JAM_RULES.md`.
 
 ## License
 
