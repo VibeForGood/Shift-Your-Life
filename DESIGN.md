@@ -3,8 +3,7 @@
 GitHub Game Off 2026 · Theme: **SHIFT** · Solo developer, AI-assisted
 
 Rules: see `JAM_RULES.md`. This design draws on ideas from earlier prototypes;
-none are required to play or build this game. Deadline **Dec 1, 2026, 13:37 PST**.
-Target submit **Nov 28**.
+none are required to play or build this game.
 
 ---
 
@@ -266,19 +265,122 @@ the current build. If the game is ever ported to GameMaker, the data files and
 → itch.io "HTML" project, "played in the browser", 1280×720 viewport, mobile
 friendly (landscape), fullscreen button. Full steps in `ITCH_PAGE.md`. Optionally also GitHub Pages.
 
-## 10. Original milestone schedule
+## 10. Expansion: Office life (in design, `office-life` branch)
 
-This was the planned schedule; the game ultimately grew to seven weeks. The
-dates below are targets, not a record of completion.
+An expansion to the base game (the seven home weeks), treated like DLC. Same verb,
+same rules, new place: your workday at **Halcyon Insurance**, where you work as
+a claims analyst (see §3).
 
-| Dates | Milestone | Done when |
+> Your doctor says sit less, eat better, sleep more. Your job says sit here,
+> eat that, answer this. You can't change the job. You can **shift** your desk.
+
+### 10.1 How it fits
+
+- **An add-on, kept separate in the code.** The office files live in their own
+  folder (`src/office/`) and load after the base game. Remove their script tags
+  and the base game runs exactly as before. The title screen shows an
+  **Office life** entry only when the expansion is loaded.
+- **The story continues after the day-49 retest.** Dr Reyes is pleased you've
+  made a start but wants you to keep going: the evenings are sorted, now the
+  workdays need to change too. Follow-up on day 84.
+- **Weight carries over.** Office weeks start from your day-49 weight. If the
+  home weeks haven't been played in this session, the expansion starts from a
+  fixed default weight.
+- Its own habit set, starting from office defaults (email and scrolling high,
+  stairs and walking low). Home habits don't carry over.
+- **The weekly weigh-in continues** (`health.js`), with office inputs: proper
+  lunch, no vending or biscuits, stairs and lunch walks (active minutes), and
+  hours spent sitting.
+- Same loop as §4: brief card → plan (drag objects, limited moves, SHIFT view) →
+  run (the day plays out, decision bubbles) → result + **Try this in your life**.
+
+### 10.2 The office floor
+
+One cutaway floor, fixed camera. Zones from left to right:
+
+| Zone | Slots |
+|---|---|
+| Lobby | coat stand, bag hook, locker (hidden) |
+| Your desk | desktop, side shelf, under desk (far), desk drawer (hidden) |
+| Kitchenette | counter, table, fridge (hidden) |
+
+Fixed things you **can't** move: the lift, the vending machine (kitchenette) and
+your coworker Sam's desk next to yours. They give steady pulls that you have to
+work around, the way a real office does.
+
+### 10.3 The workday route
+
+Unlike the evening, your desk is visited twice and desk visits are **time blocks**:
+you keep making decisions there until the block ends.
+
+```
+[Lobby]  →  [Desk: morning]  →  [Kitchenette]  →  [Desk: afternoon]  →  [Lobby]
+ 08:45       until 12:30          lunch            until 17:30           leave?
+```
+
+| Stop | Choices |
+|---|---|
+| Lobby (arrive) | Take the stairs · Take the lift (default) · Scroll |
+| Desk blocks | Deep work · Check email (default) · Scroll · Chat with Sam · Snack · Stand while working · Refill water |
+| Kitchenette | Proper lunch · Vending machine · Lunch walk · Back to desk (eat at desk) |
+| Lobby (leave) | Leave on time · Stay late · Take the laptop home |
+
+Checking email is the office's "Carry on": a fixed baseline that weak cues can't beat.
+
+### 10.4 Objects (10)
+
+| Object | Pulls towards | Notes |
 |---|---|---|
-| Nov 5–8 | **M1 Greybox** | Boxes-and-circles room, drag/drop, sim runs, Week 1 playable, level checker works |
-| Nov 9–13 | **M2 Game** | Decision bubble, SHIFT view, all 7 weeks, habits, stars, retry. *Playable start to finish.* |
-| Nov 14–19 | **M3 Look & sound** | Art pass, character animations, sound effects, music, title/ending |
-| Nov 20–24 | **M4 Playtest** | Friends play it cold; fix confusion; balance; stretch goals if time |
-| Nov 25–28 | **M5 Ship** | README, LICENSE, credits, AI disclosure, itch page, screenshots, **submit Nov 28** |
-| Nov 29–Dec 1 | Buffer | Only fixes |
+| Phone | **Scroll** (strong) | Lowers Deep work by 2 wherever it reaches, as at home. |
+| Work laptop | **Deep work** at the desk | In the lobby bag it pulls **Take the laptop home** instead. In the locker: no pull at all. |
+| Priority list | **Deep work** | A sticky note with today's one big task. |
+| Noise-cancelling headphones | **Deep work** | Cancels Sam's chat pull. |
+| Biscuit tin | **Snack** (strong) | The office version of the snack jar. |
+| Packed lunch | **Proper lunch** | Competes with the vending machine. |
+| Water bottle | **Refill water** | Each refill is a short walk: also counts towards moving more. |
+| Trainers | **Stairs**, **Lunch walk** | Strongest in the lobby and kitchenette. |
+| Standing mat | **Stand while working** | Only works at the desk. |
+| Evening plans (Maya's cinema ticket) | **Leave on time** | Ties back to the base game. |
+
+### 10.5 Weeks (5)
+
+| Week | Shift | Twist | Goals | Moves | Real-life tip (sources to verify) |
+|---|---|---|---|---|---|
+| O1 | Deep work | Open-plan noise | 2 h deep work · no scrolling at your desk | 2 | Phone out of reach, check email in batches (Ward 2017; Kushlev & Dunn 2015; Mark 2008) |
+| O2 | Move more | — | Stairs · lunch walk · stand for an hour | 3 | Cues at the point of decision; break up sitting (Soler 2010; Shrestha 2018; Thøgersen-Ntoumani 2015) |
+| O3 | Food at work | Birthday cake in the kitchenette | Proper lunch · no vending or biscuits · drink water | 3 | Make the good option the visible one (Thorndike 2012; Hollands 2019) |
+| O4 | Leave on time | Boss emails at 17:00 | Leave by 17:45 · laptop stays at work · 1 h deep work | 3 | Switch off after work (Sonnentag & Fritz 2015; Becker 2021) |
+| O5 | The whole day | Deadline week | Deep work · stairs or lunch walk · proper lunch · leave on time | 3 | If-then plans for busy days (Gollwitzer & Sheeran 2006) |
+
+Every source above is a candidate. Each must be added to
+`SelfImprovement_Research.md` and checked before it appears in the game.
+
+**Ending:** day 84, **second retest with Dr Reyes**, in the same style as the
+home ending. It compares day 1, day 49 and day 84: weight, blood pressure, HbA1c
+(day 84 is about three months in, so this estimate is less early than the
+day-49 one) and diabetes risk. Next to the numbers it shows your office shift
+list, with the five office tips, ticked where you nailed the week.
+
+### 10.6 What the code needs
+
+- `world.js` → one world per game area (`SYL.WORLDS.home` in the base game, `SYL.WORLDS.office` registered by the expansion);
+  each level names its world. `sim.js` takes the world as a parameter (still no Phaser).
+- Separate zone **layout** (for reach) from the **route** (visit order), so the
+  desk can be visited twice.
+- **Time-block zones**: decisions repeat at a zone until its end time.
+- **Fixed pull sources** (lift, vending machine, Sam) that aren't draggable.
+- Everything office-only (world data, levels, art, intro cards, ending) goes in
+  `src/office/`. Base files only get generic hooks (world parameter, time
+  blocks, fixed pulls, a title-screen slot for an expansion), never office content.
+- `health.js` accepts a starting weight and office inputs; the ending can show
+  three points in time (day 1, 49, 84).
+- `tools/check-levels.js` and `tests/smoke.js` cover the base game and the expansion.
+
+### 10.7 Decided
+
+- Weigh-ins continue, and weight carries over from the home weeks.
+- The expansion ends with Dr Reyes (day 84 retest).
+- Office results **don't** affect the home evenings for now. The two stay independent.
 
 ## 11. How you test it
 
