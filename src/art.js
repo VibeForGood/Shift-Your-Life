@@ -467,5 +467,5 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return { door: door, setTime: setTime, bedX: 1098, bedY: 382 };
   }
 
-  SYL.art = { ensureTextures: ensureTextures, makeHero: makeHero, drawApartment: drawApartment, shapes: shapes, FLOOR_Y: FLOOR_Y };
+  SYL.art = { ensureTextures: ensureTextures, makeHero: makeHero, drawApartment: drawApartment, shapes: shapes, line: line, ICONS: ICONS, FLOOR_Y: FLOOR_Y };
 })();

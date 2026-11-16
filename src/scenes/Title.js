@@ -61,9 +61,20 @@ SYL.TitleScene = class extends Phaser.Scene {
     this.shiftKey.on('down', () => this.drawPulls());
     this.shiftKey.on('up', () => this.drawPulls());
 
-    SYL.button(this, 640, 630, 240, 64, 'Start', () => {
-      SYL.state.reset();
+    // Start the base game. Any loaded expansions get a button of their own beside it.
+    var extra = SYL.CAMPAIGN_ORDER.filter((id) => id !== 'home');
+    var bw = 240, gap = 24;
+    var x0b = 640 - ((extra.length + 1) * bw + extra.length * gap) / 2 + bw / 2;
+    SYL.button(this, x0b, 630, bw, 64, 'Start', () => {
+      SYL.state.reset('home');
       this.scene.start('Story');
+    });
+    extra.forEach((id, i) => {
+      var cp = SYL.CAMPAIGNS[id];
+      SYL.button(this, x0b + (i + 1) * (bw + gap), 630, bw, 64, cp.titleButton || cp.name, () => {
+        SYL.state.reset(id);
+        this.scene.start(cp.story || 'Story', { cards: cp.storyCards });
+      }, { fill: cp.titleFill });
     });
     SYL.muteButton(this);
     SYL.text(this, 8, 712, SYL.VERSION, 13, C.inkSoft).setOrigin(0, 1).setDepth(100);

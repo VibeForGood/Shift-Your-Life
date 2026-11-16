@@ -67,6 +67,13 @@ SYL.WORLD = {
   // Tie-break order (earlier wins a tie).
   priority: ['carry', 'sleep', 'eat', 'run', 'focus', 'call', 'read', 'rest', 'snack', 'scroll', 'bedscroll'],
 
+  // Visit order. You potter about until bedtime before the bedroom decision.
+  route: [
+    { zone: 'door' }, { zone: 'hall' }, { zone: 'kitchen' }, { zone: 'living' },
+    { zone: 'bedroom', waitUntil: 22 * 60 + 30 },
+  ],
+  end: { type: 'sleep', zone: 'bedroom' },
+
   walkMins: 10, // between waypoints
   bedtime: 22 * 60 + 30, // you head to bed at 22:30 (or later if busy)
   habitWeight: 2,

@@ -22,9 +22,11 @@ SYL.HABIT_ROWS = [
   ['focus', 'Focus', SYL.C.good, 'Focused work'], ['rest', 'Rest', SYL.C.rest, 'Resting'],
   ['call', 'Friends', SYL.C.good, 'Calling friends'], ['read', 'Read', SYL.C.rest, 'Reading in bed'],
 ];
-// Your weight right now: start weight plus every finished week.
+// Your weight right now: this campaign's start weight plus every finished week.
 SYL.currentKg = function () {
-  return SYL.health.START.kg + SYL.state.healthWeeks.reduce(function (n, w) { return n + w.dKg; }, 0);
+  var st = SYL.state;
+  var kg0 = st.startKg === undefined ? SYL.health.START.kg : st.startKg;
+  return kg0 + st.healthWeeks.reduce(function (n, w) { return n + w.dKg; }, 0);
 };
 SYL.hex = function (n) { return '#' + n.toString(16).padStart(6, '0'); };
 SYL.FONT = '"Trebuchet MS", "Segoe UI", Arial, sans-serif';
@@ -77,16 +79,22 @@ SYL.tween = function (scene, cfg) {
 };
 
 SYL.state = {
+  campaign: 'home',
   levelIndex: 0,
   habits: Object.assign({}, SYL.WORLD.startHabits),
   history: [],
   healthWeeks: [],
   speed: 1,
-  reset: function () {
+  // Finished campaigns this session, e.g. results.home.endKg (expansions read it).
+  results: {},
+  reset: function (campaignId) {
+    this.campaign = campaignId || 'home';
+    var cp = SYL.campaign();
     this.levelIndex = 0;
-    this.habits = Object.assign({}, SYL.WORLD.startHabits);
+    this.habits = Object.assign({}, cp.world.startHabits);
     this.history = [];
     this.healthWeeks = [];
     this.briefSeen = {};
+    this.startKg = cp.startKg();
   },
 };

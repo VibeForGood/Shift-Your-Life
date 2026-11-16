@@ -112,16 +112,20 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     },
   ];
 
+  SYL.storyPill = pill; // for expansions' intro cards
+
   SYL.StoryScene = class extends Phaser.Scene {
     constructor() { super('Story'); }
 
-    create() {
+    create(data) {
+      // An expansion can pass its own intro cards: scene.start('Story', { cards: [...] }).
+      this.cards = (data && data.cards) || CARDS;
       this.add.rectangle(640, 360, 1280, 720, C.paper);
       SYL.art.ensureTextures(this);
       this.index = -1;
       this.card = null;
       this.dots = [];
-      for (var i = 0; i < CARDS.length; i++) this.dots.push(this.add.circle(640 + (i - (CARDS.length - 1) / 2) * 22, 680, 6, C.line));
+      for (var i = 0; i < this.cards.length; i++) this.dots.push(this.add.circle(640 + (i - (this.cards.length - 1) / 2) * 22, 680, 6, C.line));
       SYL.button(this, 1170, 40, 150, 44, 'Skip intro', () => this.finish(), { size: 17, fill: 0xe7dfd2 });
       this.input.keyboard.on('keydown-SPACE', () => this.next());
       this.input.keyboard.on('keydown-ENTER', () => this.next());
@@ -132,9 +136,9 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
 
     next() {
       if (this.busy) return;
-      if (this.index >= CARDS.length - 1) { this.finish(); return; }
+      if (this.index >= this.cards.length - 1) { this.finish(); return; }
       this.index++;
-      var cd = CARDS[this.index];
+      var cd = this.cards[this.index];
       if (this.card) this.card.destroy();
       var c = this.add.container(0, 0);
       cd.draw(this, c);

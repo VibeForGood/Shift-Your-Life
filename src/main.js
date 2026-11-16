@@ -10,5 +10,6 @@ SYL.game = new Phaser.Game({
   height: 720,
   backgroundColor: SYL.hex(SYL.C.bg),
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [SYL.TitleScene, SYL.StoryScene, SYL.PlayScene, SYL.EndingScene],
+  // Expansions add their own scenes (e.g. their ending) to SYL.EXTRA_SCENES.
+  scene: [SYL.TitleScene, SYL.StoryScene, SYL.PlayScene, SYL.EndingScene].concat(SYL.EXTRA_SCENES || []),
 });

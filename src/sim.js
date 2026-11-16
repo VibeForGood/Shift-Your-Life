@@ -1,13 +1,30 @@
-// Pure simulation of your evening. Deterministic: same inputs, same result.
+// Pure simulation of your evening (or workday). Deterministic: same inputs, same result.
 // No Phaser here, so the Node level checker can run it too.
+//
+// SYL.makeSim(world) builds a simulator for one world (the flat, the office...).
+// SYL.sim is the base game's simulator for the flat (SYL.WORLD).
+//
+// World features (all optional, the flat uses none of the starred ones):
+//   route: [{ zone, until*, waitUntil }]  visit order. Default: every zone once.
+//       until:     a time block. Decisions repeat here until this time;
+//                  choosing 'carry' leaves the block early.
+//       waitUntil: idle here until this time before deciding (bedtime).
+//   end: { type, zone }      the closing event ('sleep' in the bedroom by default).
+//   startTime                when the run starts (18:00 by default).
+//   fixed*: { objId: slotId }  things you can't move (vending machine...). Their
+//       slots have fixed: true. A level's twist can add more with twist.fixed.
+//   action.ends*             choosing it ends the run (leaving the office).
+//   action.excludes*: [ids]  not available once any of these is done.
+//   action.needs             an object id, or a list (any one of them will do).
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
-(function () {
-  var W = SYL.WORLD;
+SYL.makeSim = function (W) {
   var slotById = {};
   W.slots.forEach(function (s) { slotById[s.id] = s; });
   var zoneIndex = {};
   W.zones.forEach(function (z, i) { zoneIndex[z.id] = i; });
+  var route = W.route || W.zones.map(function (z) { return { zone: z.id }; });
+  var endEvent = W.end || { type: 'sleep', zone: 'bedroom' };
 
   // How much an object in `slotId` reaches a decision made in `zoneId` (0..1).
   function reach(slotId, zoneId) {
@@ -20,10 +37,17 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return 0;
   }
 
-  // Can this object go in this slot at all?
+  // Can this object go in this slot at all? Fixed slots never take objects.
   function allowed(objId, slotId) {
     var s = slotById[slotId];
-    return !!s && !(s.no && s.no.indexOf(objId) >= 0);
+    return !!s && !s.fixed && !(s.no && s.no.indexOf(objId) >= 0);
+  }
+
+  // The player's layout plus everything that can't be moved.
+  function full(level, layout) {
+    var tw = level.twist;
+    if (!W.fixed && !(tw && tw.fixed)) return layout;
+    return Object.assign({}, W.fixed || {}, (tw && tw.fixed) || {}, layout);
   }
 
   function habitKey(action) {
@@ -35,18 +59,18 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
   }
 
   // Score one action at one zone. Returns { action, score, sources: [{ label, amount, kind }] }.
-  function scoreAction(level, layout, habits, zoneId, action) {
+  function scoreAction(level, all, habits, zoneId, action) {
     var a = W.actions[action];
     var sources = [];
     var score = a.base;
     if (a.base) sources.push({ label: 'Default', amount: a.base, kind: 'base' });
 
     var ck = cueKey(action);
-    Object.keys(layout).forEach(function (objId) {
+    Object.keys(all).forEach(function (objId) {
       var o = W.objects[objId];
       var c = o.cue[ck];
       if (!c) return;
-      var r = reach(layout[objId], zoneId);
+      var r = reach(all[objId], zoneId);
       if (r <= 0) return;
       var amt = c * r;
       score += amt;
@@ -64,7 +88,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     if (tw && tw.mods && tw.mods[action]) {
       var cancelled = false;
       if (tw.cancel && tw.cancel.action === action) {
-        var where = layout[tw.cancel.object];
+        var where = all[tw.cancel.object];
         cancelled = where && reach(where, zoneId) >= 1;
       }
       if (!cancelled) {
@@ -75,14 +99,21 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return { action: action, score: Math.round(score * 100) / 100, sources: sources };
   }
 
-  function decide(level, layout, habits, zoneId, done) {
+  function hasNeed(a, all, zoneId) {
+    if (!a.needs) return true;
+    var list = Array.isArray(a.needs) ? a.needs : [a.needs];
+    return list.some(function (o) { return all[o] && reach(all[o], zoneId) > 0; });
+  }
+
+  function decide(level, all, habits, zoneId, done) {
     var options = [];
     Object.keys(W.actions).forEach(function (action) {
       var a = W.actions[action];
       if (a.zones.indexOf(zoneId) < 0) return;
       if (a.once && done[action]) return;
-      if (a.needs && !(layout[a.needs] && reach(layout[a.needs], zoneId) > 0)) return;
-      options.push(scoreAction(level, layout, habits, zoneId, action));
+      if (a.excludes && a.excludes.some(function (x) { return done[x]; })) return;
+      if (!hasNeed(a, all, zoneId)) return;
+      options.push(scoreAction(level, all, habits, zoneId, action));
     });
     options.sort(function (x, y) {
       if (y.score !== x.score) return y.score - x.score;
@@ -109,48 +140,77 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     switch (g.type) {
       case 'did': return !!res.done[g.action];
       case 'didnt': return !res.done[g.action];
+      case 'didntAny': return !g.actions.some(function (a) { return res.done[a]; });
       case 'any': return g.actions.some(function (a) { return res.done[a]; });
       case 'asleepBy': return res.asleepAt <= g.time;
+      case 'leftBy': return res.endAt <= g.time;
+      case 'minutes': return (res.mins[g.action] || 0) >= g.min;
       case 'alarm': return res.alarmOk;
     }
     return false;
   }
 
-  // Run the evening. Returns a full event log for the Run scene to animate.
+  // Run the evening (or day). Returns a full event log for the Play scene to animate.
   function simulate(level, layout, habits) {
-    var t = (level.twist && level.twist.start) || 18 * 60;
+    var tw = level.twist;
+    var t = (tw && tw.start) || W.startTime || 18 * 60;
     var events = [];
     var done = {};
-    var zones = W.zones;
+    var mins = {};
+    var all = full(level, layout);
+    var prev = null;
+    var ended = false;
 
-    for (var i = 0; i < zones.length; i++) {
-      var z = zones[i].id;
-      if (i > 0) {
-        events.push({ type: 'walk', from: zones[i - 1].id, to: z, t0: t, t1: t + W.walkMins });
+    function act(z, chosen) {
+      var a = W.actions[chosen];
+      events.push({ type: 'act', zone: z, action: chosen, t0: t, t1: t + a.mins });
+      done[chosen] = true;
+      if (habitKey(chosen) !== chosen) done[habitKey(chosen)] = true;
+      mins[chosen] = (mins[chosen] || 0) + a.mins;
+      t += a.mins;
+      if (a.ends) ended = true;
+    }
+
+    for (var i = 0; i < route.length && !ended; i++) {
+      var stop = route[i];
+      var z = stop.zone;
+      if (prev !== null && prev !== z) {
+        events.push({ type: 'walk', from: prev, to: z, t0: t, t1: t + W.walkMins });
         t += W.walkMins;
       }
-      if (z === 'bedroom' && t < W.bedtime) {
-        events.push({ type: 'idle', zone: z, t0: t, t1: W.bedtime });
-        t = W.bedtime;
+      prev = z;
+      if (stop.waitUntil && t < stop.waitUntil) {
+        events.push({ type: 'idle', zone: z, t0: t, t1: stop.waitUntil });
+        t = stop.waitUntil;
       }
-      if (level.twist && level.twist.skip && level.twist.skip.indexOf(z) >= 0) {
-        events.push({ type: 'skip', zone: z, t: t, reason: level.twist.skipReason || 'Skipping this room' });
+      if (tw && tw.skip && tw.skip.indexOf(z) >= 0) {
+        events.push({ type: 'skip', zone: z, t: t, reason: tw.skipReason || 'Skipping this room' });
         continue;
       }
-      var options = decide(level, layout, habits, z, done);
+      if (stop.until) {
+        // Time block: keep deciding until the block ends, you carry on, or the day ends.
+        while (t < stop.until && !ended) {
+          var opts = decide(level, all, habits, z, done);
+          if (!opts.length) break;
+          var pick = opts[0].action;
+          events.push({ type: 'decide', zone: z, t: t, options: opts, chosen: pick });
+          if (pick === 'carry' || !W.actions[pick].mins) {
+            if (pick !== 'carry') act(z, pick);
+            break;
+          }
+          act(z, pick);
+        }
+        if (t < stop.until && !ended && stop.hold) t = stop.until; // e.g. lunch hour
+        continue;
+      }
+      var options = decide(level, all, habits, z, done);
       var chosen = options[0].action;
       events.push({ type: 'decide', zone: z, t: t, options: options, chosen: chosen });
-      var mins = W.actions[chosen].mins;
-      if (chosen !== 'carry' && chosen !== 'sleep') {
-        events.push({ type: 'act', zone: z, action: chosen, t0: t, t1: t + mins });
-        done[chosen] = true;
-        if (habitKey(chosen) !== chosen) done[habitKey(chosen)] = true;
-        t += mins;
-      }
+      if (chosen !== 'carry' && chosen !== 'sleep') act(z, chosen);
     }
-    events.push({ type: 'sleep', zone: 'bedroom', t: t });
+    events.push({ type: endEvent.type, zone: endEvent.zone, t: t });
 
-    var res = { events: events, done: done, asleepAt: t, alarmOk: alarmOk(layout) };
+    var res = { events: events, done: done, mins: mins, endAt: t, asleepAt: t, alarmOk: alarmOk(layout) };
     res.goals = level.goals.map(function (g) {
       return { label: g.label, met: evalGoal(g, res) };
     });
@@ -174,10 +234,11 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return Object.keys(layout).filter(function (o) { return layout[o] !== level.layout[o]; }).length;
   }
 
-  // For the SHIFT view: every pull an object exerts on every zone.
+  // For the SHIFT view: every pull an object exerts on every zone (fixed things too).
   function pulls(level, layout) {
     var out = [];
-    Object.keys(layout).forEach(function (objId) {
+    var all = full(level, layout);
+    Object.keys(all).forEach(function (objId) {
       var o = W.objects[objId];
       Object.keys(o.cue).forEach(function (cue) {
         W.zones.forEach(function (z) {
@@ -185,17 +246,19 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
             return cueKey(a) === cue && W.actions[a].zones.indexOf(z.id) >= 0;
           });
           if (!usable) return;
-          var r = reach(layout[objId], z.id);
-          if (r > 0) out.push({ obj: objId, zone: z.id, action: cue, amount: o.cue[cue] * r });
+          var r = reach(all[objId], z.id);
+          if (r > 0) out.push({ obj: objId, zone: z.id, action: cue, amount: o.cue[cue] * r, slot: all[objId] });
         });
       });
     });
     return out;
   }
 
-  SYL.sim = {
+  return {
+    world: W,
     reach: reach,
     allowed: allowed,
+    full: full,
     simulate: simulate,
     updateHabits: updateHabits,
     movesUsed: movesUsed,
@@ -203,4 +266,6 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     fmt: fmt,
     slotById: slotById,
   };
-})();
+};
+
+SYL.sim = SYL.makeSim(SYL.WORLD);
