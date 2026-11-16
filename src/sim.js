@@ -19,6 +19,10 @@
 //   action.excludes*: [ids]  not available once any of these is done.
 //   action.needs             an object id, or a list (any one of them will do).
 //   action.at*               only offered at the stop with this id (e.g. 'Leave on time').
+//
+// Level fields the simulator reads: twist, goals, and optionally effects (a list of
+// twist-like { label, mods } carried over from earlier in the day), start (run start
+// time) and skipStops (stop ids to skip).
 //   filler*                  action to fill the end of a time block when the best
 //                            choice no longer fits (checking email before lunch).
 var SYL = (globalThis.SYL = globalThis.SYL || {});
@@ -89,8 +93,9 @@ SYL.makeSim = function (W) {
       sources.push({ label: 'Habit', amount: hv, kind: 'habit' });
     }
 
-    var tw = level.twist;
-    if (tw && tw.mods && tw.mods[action]) {
+    // The week's twist, then any carry-over effects (Tired, Hungry...), which work the same way.
+    [level.twist].concat(level.effects || []).forEach(function (tw) {
+      if (!(tw && tw.mods && tw.mods[action])) return;
       var cancelled = false;
       if (tw.cancel && tw.cancel.action === action) {
         var where = all[tw.cancel.object];
@@ -100,7 +105,7 @@ SYL.makeSim = function (W) {
         score += tw.mods[action];
         sources.push({ label: tw.label, amount: tw.mods[action], kind: 'twist' });
       }
-    }
+    });
     return { action: action, score: Math.round(score * 100) / 100, sources: sources };
   }
 
@@ -160,7 +165,7 @@ SYL.makeSim = function (W) {
   // Run the evening (or day). Returns a full event log for the Play scene to animate.
   function simulate(level, layout, habits) {
     var tw = level.twist;
-    var t = (tw && tw.start) || W.startTime || 18 * 60;
+    var t = level.start || (tw && tw.start) || W.startTime || 18 * 60;
     var events = [];
     var done = {};
     var mins = {};
@@ -190,6 +195,7 @@ SYL.makeSim = function (W) {
         events.push({ type: 'idle', zone: z, t0: t, t1: stop.waitUntil });
         t = stop.waitUntil;
       }
+      if (stop.id && level.skipStops && level.skipStops.indexOf(stop.id) >= 0) continue; // e.g. overslept: no stairs-or-lift choice
       if (tw && tw.skip && tw.skip.indexOf(z) >= 0) {
         events.push({ type: 'skip', zone: z, t: t, reason: tw.skipReason || 'Skipping this room' });
         continue;
@@ -280,6 +286,7 @@ SYL.makeSim = function (W) {
     allowed: allowed,
     full: full,
     simulate: simulate,
+    evalGoal: evalGoal,
     updateHabits: updateHabits,
     movesUsed: movesUsed,
     pulls: pulls,

@@ -265,36 +265,73 @@ the current build. If the game is ever ported to GameMaker, the data files and
 → itch.io "HTML" project, "played in the browser", 1280×720 viewport, mobile
 friendly (landscape), fullscreen button. Full steps in `ITCH_PAGE.md`. Optionally also GitHub Pages.
 
-## 10. Expansion: Office life (in progress, `office-life` branch)
+## 10. Full days: work and home in one game (in progress, `full-day` branch)
 
-An expansion to the base game (the seven home weeks), treated like DLC. Same verb,
-same rules, new place: your workday at **Halcyon Insurance**, where you work as
-a claims analyst (see §3).
+The office and the flat are merged into **one game**. Each week is one full day,
+standing for the whole week: the workday at **Halcyon Insurance** (see §3),
+the commute, the evening at home, and sleep. The two halves feed each other:
+bad sleep follows you into work, and a bad workday follows you home.
 
 > Your doctor says sit less, eat better, sleep more. Your job says sit here,
-> eat that, answer this. You can't change the job. You can **shift** your desk.
+> eat that, answer this. You can't change the job or the doctor. You can **shift**
+> your desk and your flat.
 
 ### 10.1 How it fits
 
-- **An add-on, kept separate in the code.** The office files live in their own
-  folder (`src/office/`) and load after the base game. Remove their script tags
-  and the base game runs exactly as before. The title screen shows an
-  **Office life** entry only when the expansion is loaded.
-- **The story continues after the day-49 retest.** Dr Reyes is pleased you've
-  made a start but wants you to keep going: the evenings are sorted, now the
-  workdays need to change too. Follow-up on day 84.
-- **Weight carries over.** Office weeks start from your day-49 weight. If the
-  home weeks haven't been played in this session, the expansion starts from a
-  fixed default weight.
-- Its own habit set, starting from office defaults (email and scrolling high,
-  stairs and walking low). Home habits don't carry over.
-- **The weekly weigh-in continues** (`health.js`), with office inputs: proper
-  lunch, no vending or biscuits, stairs and lunch walks (active minutes), and
-  hours spent sitting.
-- Same loop as §4: brief card → plan (drag objects, limited moves, SHIFT view) →
-  run (the day plays out, decision bubbles) → result + **Try this in your life**.
+- **One campaign.** It replaces the separate home weeks and the Office life
+  expansion. The title screen has a single **Start** button again.
+- **One run = one day:** 08:45 office → leave → 30 min commute → evening at
+  home → asleep. Same decision rules as before in each place.
+- **One plan, one move budget.** The plan screen toggles between **Work** and
+  **Home**. Moves count across both, so each week asks: fix work or fix home?
+- **One habit set.** Scrolling and snacking are the same habit at work and at
+  home: scroll all day and the evening phone wins more easily too.
+- Day 49 retest with Dr Reyes, as in §6, with the weekly weigh-in counting both
+  halves of the day.
 
-### 10.2 The office floor
+### 10.2 How the halves affect each other
+
+Shown to the player like twists: on the week card and in the decision bubble,
+with their own label.
+
+**Last night → today's work** (from the previous week's evening; week 1 starts
+with your old habits: asleep after midnight, phone as your alarm)
+
+| Last night | Effect at work |
+|---|---|
+| Asleep by 23:00 | **Rested:** Deep work +1 |
+| Asleep after 23:00 | **Tired:** Deep work -2, Snack +1, Scroll +1, Stairs -1 |
+| No alarm in the bedroom | **Overslept:** you get in at 09:45 and miss the stairs-or-lift choice |
+
+**Today's work → this evening**
+
+| At work | Effect at home |
+|---|---|
+| Time you leave | You get home 30 min later (stay late, get home late) |
+| No proper lunch | **Hungry:** Snack +2 |
+| Less than an hour of deep work | **Frazzled:** Rest +1, Scroll +1 |
+| Took the laptop home | **Work email:** Scroll +1, Sleep -1 |
+| Took the stairs or a lunch walk | **Already moving:** Run +1 |
+
+### 10.3 Weeks (7)
+
+Each week has goals at work, at home or both, one move budget, and one
+"Try this in your life" tip.
+
+| Week | Shift | Goals | Notes |
+|---|---|---|---|
+| 1 | Move | Take the stairs · go for a run | You start tired from your old nights. |
+| 2 | Sleep | An hour of deep work · asleep by 23:00 · alarm in the bedroom | Next week's workday depends on tonight. |
+| 3 | Food | Proper lunch · proper dinner · no snacking | Skipping lunch makes the evening snacks harder to beat. |
+| 4 | Focus | 2 hours of deep work · no scrolling all day · asleep by 23:00 | Open-plan noise. |
+| 5 | Leave on time | Leave on time · laptop stays at work · call Maya | |
+| 6 | Make it fun | Lunch walk · go for a run · no snacking | Raining after work. |
+| 7 | Hard days | Deadline at work · run or rest · proper dinner · asleep by 23:00 | If-then plans. |
+
+The office floor, objects and time-block rules below (from the Office life
+build) still apply to the work half. The flat is as in §5.
+
+### 10.4 The office floor
 
 One cutaway floor, fixed camera. Zones from left to right:
 
@@ -308,7 +345,7 @@ Fixed things you **can't** move: the vending machine (kitchenette) and your
 coworker Sam at the next desk. They give steady pulls that you have to work
 around, the way a real office does. A twist can add more (the birthday cake).
 
-### 10.3 The workday route
+### 10.5 The workday route
 
 Unlike the evening, your desk is visited twice and desk visits are **time blocks**:
 you keep making decisions there until the block ends.
@@ -335,7 +372,7 @@ Time-block rules:
 - A proper lunch fills you up: no snacking afterwards. Lunch and the vending
   machine rule each other out.
 
-### 10.4 Objects (11 + fixed)
+### 10.6 Office objects (11 + fixed)
 
 | Object | Pulls towards | Notes |
 |---|---|---|
@@ -354,50 +391,30 @@ Time-block rules:
 | *Vending machine (fixed)* | Vending machine lunch | |
 | *Birthday cake (fixed, week 3)* | Snack | |
 
-### 10.5 Weeks (5)
+### 10.7 Weigh-in, sources, ending
 
-| Week | Shift | Twist | Goals | Moves | Real-life tip (sources to verify) |
-|---|---|---|---|---|---|
-| O1 | Deep work | Open-plan noise | 2 h deep work · no scrolling | 2 | Phone out of sight, check email at set times (Leroy 2009; Ward 2017; Kushlev & Dunn 2015) |
-| O2 | Move more | — | Stairs · lunch walk · stand for an hour | 3 | Cues at the point of decision; break up sitting (Soler 2010; Shrestha 2018; Thøgersen-Ntoumani 2015) |
-| O3 | Food at work | Birthday cake in the kitchenette | Proper lunch · no vending machine, no snacks · refill water | 3 | Make the good option the visible one (Thorndike 2012; Hollands 2019) |
-| O4 | Leave on time | Boss emails at 17:00 | Leave on time · laptop stays at work · 1 h deep work | 3 | Switch off after work (Sonnentag & Fritz 2015; Becker 2021) |
-| O5 | The whole day | Deadline week | Some deep work · stairs or lunch walk · proper lunch · leave on time | 3 | If-then plans for busy days (Gollwitzer & Sheeran 2006) |
-
-Every source above is a candidate. Each must be added to
-`SelfImprovement_Research.md` and checked before it appears in the game. Until
-then the result card's research line only uses lines already checked for the
-base game.
-
-**Weekly weigh-in** (`src/office/health.js`): the base game's model, with a
-proper lunch (-300 kcal/day), no snacking (as at home) and lunchtime walks
-(-100 kcal/day averaged, 150 active minutes a week). Stairs add 25 active
-minutes. Staying late and taking work home show up as "held back by".
+**Weekly weigh-in:** both halves count. Home as in §6 (proper dinner, no
+snacking, asleep by 23:00, running) plus work: a proper lunch (-300 kcal/day)
+and lunchtime walks (-100 kcal/day averaged, 150 active minutes a week); stairs
+add 25 active minutes. Snacking at work or at home counts as snacking.
 Illustrative numbers, to be checked like the rest.
 
-**Ending:** day 84, **second retest with Dr Reyes**, in the same style as the
-home ending. It compares day 1, day 49 and day 84: weight, blood pressure, HbA1c
-(day 84 is about three months in, so this estimate is less early than the
-day-49 one), diabetes risk and active minutes. Next to the numbers it shows your
-office shift list, with the five office tips, ticked where you nailed the week.
+**Sources:** the office tips' sources are still candidates (Leroy 2009; Ward
+2017; Kushlev & Dunn 2015; Soler 2010; Shrestha 2018; Thøgersen-Ntoumani 2015;
+Thorndike 2012; Sonnentag & Fritz 2015; Becker 2021). Each must be added to
+`SelfImprovement_Research.md` and checked before it appears in the game.
 
-### 10.6 How it's built
+**Ending:** the day-49 retest with Dr Reyes (§6), with the seven tips as your
+shift list.
 
-- `src/sim.js` is `SYL.makeSim(world)`; `SYL.sim` is the flat's. Optional world
-  features: a route that can revisit zones, time blocks, stop-only actions,
-  fixed objects, actions that end the run, a filler action, minute totals.
-- `src/campaign.js` holds the campaign registry. The flat registers as `home`; the
-  expansion registers `office` with its world, weeks, labels, weigh-in, intro
-  cards and ending scene. The scenes read the current campaign.
-- Everything office-only is in `src/office/` (world, levels, health, art,
-  campaign, ending). Base files only have generic hooks.
-- `tools/check-levels.js` and `tests/smoke.js` cover the base game and the expansion.
+### 10.8 How it's built
 
-### 10.7 Decided
-
-- Weigh-ins continue, and weight carries over from the home weeks.
-- The expansion ends with Dr Reyes (day 84 retest).
-- Office results **don't** affect the home evenings for now. The two stay independent.
+- `src/sim.js` is `SYL.makeSim(world)`, one simulator per place. A day runs the
+  office simulator, then the flat's, passing the carry-over effects between them
+  (and from each night to the next week's workday).
+- The office world, art and weigh-in stay in `src/office/`, now part of the game.
+- `tools/check-levels.js` brute-forces both layouts under one move budget, with
+  the previous night carried in. `tests/smoke.js` plays the full game.
 
 ## 11. How you test it
 

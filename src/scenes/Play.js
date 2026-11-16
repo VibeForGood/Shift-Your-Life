@@ -17,12 +17,35 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
   SYL.PlayScene = class extends Phaser.Scene {
     constructor() { super('Play'); }
 
-    create() {
+    // data (full-day campaigns): { phase: 'work' | 'home', keep: keep the plan, running: play this phase's run }
+    create(data) {
+      data = data || {};
       CP = SYL.campaign();
-      W = CP.world;
-      SIM = CP.sim;
-      this.level = CP.levels[SYL.state.levelIndex];
-      this.layout = Object.assign({}, this.level.layout);
+      var st = SYL.state;
+      this.dayLevel = CP.day ? CP.levels[st.levelIndex] : null;
+      if (this.dayLevel) {
+        // A full day: two places, one plan. The scene shows one place at a time.
+        var DL = this.dayLevel;
+        this.phase = data.phase || 'work';
+        if (!data.keep || !st.plan || st.plan.id !== DL.id) {
+          st.plan = { id: DL.id, layouts: { work: Object.assign({}, DL.work.layout), home: Object.assign({}, DL.home.layout) } };
+          st.run = null;
+        }
+        W = this.phase === 'work' ? SYL.day.work.world : SYL.day.home.world;
+        SIM = this.phase === 'work' ? SYL.day.work : SYL.day.home;
+        var part = DL[this.phase];
+        this.level = {
+          id: DL.id, week: DL.week, title: DL.title, topic: DL.topic, brief: DL.brief, tip: DL.tip,
+          moves: DL.moves, goals: DL.goals, layout: part.layout, twist: part.twist, locked: part.locked,
+        };
+        this.layout = st.plan.layouts[this.phase];
+      } else {
+        W = CP.world;
+        SIM = CP.sim;
+        this.level = CP.levels[st.levelIndex];
+        this.layout = Object.assign({}, this.level.layout);
+      }
+      this.running = !!data.running;
       this.mode = 'plan';
       this.objViews = {};
       this.lastDecide = null; // the scene object is reused between weeks and retries
@@ -37,10 +60,32 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.overlayTexts = [];
       this.setupInput();
       this.refresh();
-      this.showBrief();
+      if (this.running) this.time.delayedCall(250, () => this.continueRun());
+      else this.showBrief();
       SYL.muteButton(this);
 
       SYL.debug = this; // handy for automated tests
+    }
+
+    // Moves used so far (a full day counts both places).
+    movesUsed(layout) {
+      if (!this.dayLevel) return SIM.movesUsed(this.level, layout);
+      var L = Object.assign({}, SYL.state.plan.layouts);
+      L[this.phase] = layout;
+      return SYL.day.movesUsed(this.dayLevel, L);
+    }
+
+    setLayout(next) {
+      this.layout = next;
+      if (this.dayLevel) SYL.state.plan.layouts[this.phase] = next;
+    }
+
+    // Full day: swap between planning the office and the flat.
+    switchPhase() {
+      if (this.mode !== 'plan') return;
+      SYL.audio.play('swap');
+      this.cameras.main.fadeOut(140, 246, 240, 230);
+      this.time.delayedCall(150, () => this.scene.restart({ phase: this.phase === 'work' ? 'home' : 'work', keep: true }));
     }
 
     // ---------- drawing ----------
@@ -49,7 +94,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.add.rectangle(640, 360, 1280, 720, C.paper);
       SYL.art.ensureTextures(this);
       this.add.graphics().fillStyle(0x000000, 0.08).fillRoundedRect(34, ROOM.top + 6, 1220, ROOM.bottom - ROOM.top, 10);
-      this.apt = CP.drawWorld(this, ROOM);
+      this.apt = CP.drawWorld(this, ROOM, this.phase);
       var g = this.add.graphics().setDepth(9);
       g.lineStyle(5, C.ink, 0.85).strokeRoundedRect(30, ROOM.top, 1220, ROOM.bottom - ROOM.top, 6);
       W.zones.forEach((z) => {
@@ -260,13 +305,13 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       var next = Object.assign({}, this.layout);
       next[objId] = slotId;
       if (other) next[other] = from; // swap
-      if (SIM.movesUsed(this.level, next) > this.level.moves) {
+      if (this.movesUsed(next) > this.level.moves) {
         SYL.audio.play('deny');
         this.toast('Out of moves. Put something back first (or Reset).');
         this.placeObject(objId, true);
         return;
       }
-      this.layout = next;
+      this.setLayout(next);
       SYL.audio.play(other ? 'swap' : SIM.slotById[slotId].kind === 'hidden' ? 'hidden' : 'drop');
       this.placeObject(objId, true);
       if (other) this.placeObject(other, true);
@@ -286,13 +331,13 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
 
     resetLayout() {
       if (this.mode !== 'plan') return;
-      this.layout = Object.assign({}, this.level.layout);
+      this.setLayout(Object.assign({}, this.level.layout));
       Object.keys(this.layout).forEach((id) => this.placeObject(id, true));
       this.refresh();
     }
 
     refresh() {
-      var used = SIM.movesUsed(this.level, this.layout);
+      var used = this.movesUsed(this.layout);
       this.movesText.setText('Moves: ' + used + ' / ' + this.level.moves);
       this.movesText.setColor(SYL.hex(used >= this.level.moves ? C.trap : C.ink));
       this.updateOverlay();
