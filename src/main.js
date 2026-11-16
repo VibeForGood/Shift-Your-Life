@@ -1,5 +1,8 @@
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
+// Shown in the bottom-left of the title screen. Bump on each itch.io upload.
+SYL.VERSION = 'v1.0';
+
 SYL.game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',

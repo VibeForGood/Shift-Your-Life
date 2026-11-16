@@ -66,6 +66,7 @@ SYL.TitleScene = class extends Phaser.Scene {
       this.scene.start('Story');
     });
     SYL.muteButton(this);
+    SYL.text(this, 8, 712, SYL.VERSION, 13, C.inkSoft).setOrigin(0, 1).setDepth(100);
   }
 
   drawPulls() {
