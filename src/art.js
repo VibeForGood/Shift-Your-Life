@@ -351,6 +351,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       { t: 'rr', x: 594, y: 436, w: 52, h: 6, r: 2, c: WOOD_D },
       { t: 'rr', x: 572, y: 394, w: 96, h: 12, r: 5, c: WOOD },
       { t: 'rr', x: 672, y: 340, w: 8, h: 100, r: 3, c: 0xe0645a },
+      { t: 'rr', x: 652, y: 406, w: 5, h: 34, r: 2, c: 0xe0645a }, // chair front leg
       { t: 'rr', x: 650, y: 400, w: 30, h: 8, r: 3, c: 0xe0645a },
     ], 4);
     // --- Living room: picture, coffee table, couch
