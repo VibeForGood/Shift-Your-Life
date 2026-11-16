@@ -91,7 +91,10 @@ SYL.state = {
     this.campaign = campaignId || 'home';
     var cp = SYL.campaign();
     this.levelIndex = 0;
-    this.habits = Object.assign({}, cp.world.startHabits);
+    this.habits = Object.assign({}, cp.startHabits || cp.world.startHabits);
+    this.night = null; // full day: last night's sleep (null = your old habits)
+    this.plan = null;
+    this.run = null;
     this.history = [];
     this.healthWeeks = [];
     this.briefSeen = {};

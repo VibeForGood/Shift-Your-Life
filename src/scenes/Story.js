@@ -98,8 +98,9 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     },
     {
       draw: function (s, c) {
-        SYL.LEVELS.forEach(function (L, i) {
-          var x = 640 + (i - (SYL.LEVELS.length - 1) / 2) * 150;
+        var LV = SYL.campaign().levels;
+        LV.forEach(function (L, i) {
+          var x = 640 + (i - (LV.length - 1) / 2) * 150;
           var img = s.add.image(x, 220, 'icon_' + L.topic.icon).setScale(1.1).setAlpha(0);
           var t = SYL.text(s, x, 270, L.topic.name, 17, C.ink, { fontStyle: 'bold' }).setOrigin(0.5).setAlpha(0);
           var n = SYL.text(s, x, 296, 'Week ' + L.week, 13, C.inkSoft).setOrigin(0.5).setAlpha(0);
@@ -107,7 +108,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
           s.tweens.add({ targets: [img, t, n], alpha: 1, y: '-=8', duration: 300, delay: 150 + i * 180 });
         });
       },
-      text: "You can't make yourself do anything. But you can shift what's around you. Seven weeks, seven shifts, one evening at a time. Then Dr Reyes retests you on day 49.",
+      text: "You can't make yourself do anything. But you can shift what's around you, at work and at home. Seven weeks, seven shifts, one day at a time. Then Dr Reyes retests you on day 49.",
       last: true,
     },
   ];

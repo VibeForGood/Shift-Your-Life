@@ -133,6 +133,29 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.movesText = SYL.text(this, 1240, 66, '', 22, C.ink, { fontStyle: 'bold' }).setOrigin(1, 0);
       this.clockText = SYL.text(this, 1236, ROOM.bottom - 46, '', 24, C.ink, { fontStyle: 'bold', backgroundColor: '#fffaf2', padding: { x: 10, y: 4 } }).setOrigin(1, 0).setDepth(9);
       this.setClock((L.twist && L.twist.start) || W.startTime || 18 * 60);
+      if (this.dayLevel) this.drawEffects();
+    }
+
+    // Full day: what carries into this half (last night -> work, work -> evening).
+    dayEffects() {
+      var st = SYL.state;
+      if (this.phase === 'work') return SYL.day.nightEffects(st.night).effects;
+      return st.run ? st.run.evening.effects : null; // the evening depends on how the workday goes
+    }
+
+    drawEffects() {
+      if (this.effectViews) this.effectViews.forEach((v) => v.destroy());
+      this.effectViews = [];
+      var fx = this.dayEffects();
+      var y = ROOM.top + 34;
+      var add = (str, col) => {
+        var t = SYL.text(this, 1240, y, str, 14, 0xffffff, { backgroundColor: SYL.hex(col), padding: { x: 7, y: 3 }, fontStyle: 'bold' }).setOrigin(1, 0).setDepth(9);
+        this.effectViews.push(t);
+        y += 24;
+      };
+      if (!fx) { add('This evening depends on your workday', C.inkSoft); return; }
+      var good = { rested: 1, moving: 1 };
+      fx.forEach((f) => add((this.phase === 'work' ? 'Last night: ' : 'From work: ') + f.label + '  ·  ' + f.desc, good[f.id] ? C.good : C.trap));
     }
 
     drawBottomBar() {
@@ -157,6 +180,10 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.resetBtn = SYL.button(this, 1080, 672, 120, 46, 'Reset', () => this.resetLayout(), { size: 18, fill: 0xe7dfd2 });
       this.speedBtn = SYL.button(this, 1200, 672, 90, 46, SYL.state.speed + '×', () => this.cycleSpeed(), { size: 18, fill: 0xe7dfd2 });
       this.pullBtn = SYL.button(this, 935, 590, 150, 64, 'Pulls (SHIFT)', () => { this.pullToggle = !this.pullToggle; this.updateOverlay(); }, { size: 17, fill: 0xd9e6f7 });
+      if (this.dayLevel) {
+        // Full day: plan the other place. Moves count across both.
+        this.phaseBtn = SYL.button(this, 935, 672, 150, 46, this.phase === 'work' ? 'Plan home →' : '← Plan work', () => this.switchPhase(), { size: 17, fill: 0xf2e0b5 });
+      }
 
       this.toastText = SYL.text(this, 640, ROOM.top + 40, '', 20, 0xffffff, { backgroundColor: SYL.hex(C.ink), padding: { x: 12, y: 6 } }).setOrigin(0.5).setDepth(50).setAlpha(0);
     }
@@ -338,6 +365,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
 
     refresh() {
       var used = this.movesUsed(this.layout);
+      // (a full day shows the place in the clock box; moves count across both places)
       this.movesText.setText('Moves: ' + used + ' / ' + this.level.moves);
       this.movesText.setColor(SYL.hex(used >= this.level.moves ? C.trap : C.ink));
       this.updateOverlay();
@@ -359,8 +387,8 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       var dim = this.add.rectangle(640, 360, 1280, 720, 0x1b1e3a, 0.55).setDepth(60).setInteractive();
       var p = this.add.container(640, 360).setDepth(61);
       var g = this.add.graphics();
-      g.fillStyle(0x000000, 0.2).fillRoundedRect(-380, -262, 760, 530, 22);
-      g.fillStyle(C.paper, 1).fillRoundedRect(-380, -270, 760, 530, 22);
+      g.fillStyle(0x000000, 0.2).fillRoundedRect(-380, -262, 760, this.dayLevel ? 560 : 530, 22);
+      g.fillStyle(C.paper, 1).fillRoundedRect(-380, -270, 760, this.dayLevel ? 560 : 530, 22);
       g.fillStyle(C.accent, 1).fillRoundedRect(-380, -270, 760, 64, { tl: 22, tr: 22, bl: 0, br: 0 });
       p.add(g);
       p.add(SYL.text(this, 0, -238, 'SHIFT ' + L.week + ' OF ' + CP.levels.length, 24, C.ink, { fontStyle: 'bold' }).setOrigin(0.5));
@@ -369,23 +397,35 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       p.add(SYL.text(this, -170, -140, L.topic.name, 48, C.ink, { fontStyle: 'bold' }));
       p.add(SYL.text(this, -330, -70, L.brief, 20, C.ink, { wordWrap: { width: 660 } }));
       var y = -10;
-      if (L.twist) {
-        p.add(SYL.text(this, -330, y, L.twist.label + ':  ' + L.twist.desc, 16, 0xffffff, { backgroundColor: SYL.hex(C.trap), padding: { x: 8, y: 4 }, fontStyle: 'bold' }));
-        y += 40;
+      var DL = this.dayLevel;
+      var twists = DL ? [DL.work.twist && ['At work', DL.work.twist], DL.home.twist && ['At home', DL.home.twist]].filter(Boolean) : (L.twist ? [[null, L.twist]] : []);
+      twists.forEach((tw) => {
+        p.add(SYL.text(this, -330, y, (tw[0] ? tw[0] + ' · ' : '') + tw[1].label + ':  ' + tw[1].desc, 16, 0xffffff, { backgroundColor: SYL.hex(C.trap), padding: { x: 8, y: 4 }, fontStyle: 'bold' }));
+        y += DL ? 34 : 40;
+      });
+      if (DL) {
+        // How last night left you, for today's work.
+        var fx = SYL.day.nightEffects(SYL.state.night).effects;
+        var lastNight = SYL.state.night ? 'Last night' : 'Last night (your old habits)';
+        p.add(SYL.text(this, -330, y, lastNight + ':  ' + fx.map((f) => f.label + ' (' + f.desc + ')').join('  ·  '), 15, fx.some((f) => f.id === 'rested') && fx.length === 1 ? C.good : C.trap, { fontStyle: 'bold', wordWrap: { width: 660 } }));
+        y += fx.length > 1 ? 44 : 30;
       }
+      var gap = DL ? 26 : 28;
       p.add(SYL.text(this, -330, y, CP.goalsHeading, 14, C.inkSoft, { fontStyle: 'bold' }));
-      L.goals.forEach((gl, i) => p.add(SYL.text(this, -330, y + 22 + i * 28, '○  ' + gl.label, 20, C.ink)));
-      var gy = y + 22 + L.goals.length * 28 + 10;
-      var how = L.week === 1
-        ? 'You can only move ' + L.moves + ' things. Drag them to new spots, hold SHIFT to see what pulls you, then press ' + CP.runLabel + '.'
-        : 'You can move ' + L.moves + ' things. The habits you built last week come with you.';
+      L.goals.forEach((gl, i) => p.add(SYL.text(this, -330, y + 22 + i * gap, '○  ' + gl.label, 20, C.ink)));
+      var gy = y + 22 + L.goals.length * gap + (DL ? 6 : 10);
+      var how = DL
+        ? (L.week === 1 ? 'Move up to ' + L.moves + ' things across work AND home. Drag to new spots, hold SHIFT to see pulls, switch places with Plan home.' : 'Up to ' + L.moves + ' moves across work and home. Your habits and last night come with you.')
+        : L.week === 1
+          ? 'You can only move ' + L.moves + ' things. Drag them to new spots, hold SHIFT to see what pulls you, then press ' + CP.runLabel + '.'
+          : 'You can move ' + L.moves + ' things. The habits you built last week come with you.';
       p.add(SYL.text(this, -330, gy, how, 17, C.inkSoft, { wordWrap: { width: 660 }, fontStyle: 'italic' }));
       var close = () => {
         if (this.mode !== 'brief') return;
         this.mode = 'plan';
         this.tweens.add({ targets: [p, dim], alpha: 0, duration: 200, onComplete: () => { p.destroy(); dim.destroy(); } });
       };
-      p.add(SYL.button(this, 0, 222, 240, 56, 'Time to shift', close));
+      p.add(SYL.button(this, 0, this.dayLevel ? 252 : 222, 240, 56, 'Time to shift', close));
       this.input.keyboard.once('keydown-ENTER', close);
       p.setScale(0.85).setAlpha(0);
       this.tweens.add({ targets: p, scale: 1, alpha: 1, duration: 260, ease: 'Back.out' });
@@ -441,7 +481,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
 
     setClock(t) {
       this.clockT = t;
-      this.clockText.setText(SIM.fmt(Math.round(t)));
+      this.clockText.setText((this.dayLevel ? (this.phase === 'work' ? 'At work  ·  ' : 'At home  ·  ') : '') + SIM.fmt(Math.round(t)));
       if (this.apt) this.apt.setTime(t);
     }
 
@@ -451,21 +491,64 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     }
 
     say(text, color) {
-      this.pipLabel.setText(text).setVisible(true).setPosition(this.pip.x, this.pip.y + this.pipArt.top - 18);
+      this.pipLabel.setText(text).setVisible(true);
+      var hw = this.pipLabel.width / 2 + 8; // keep the whole label on screen
+      this.pipLabel.setPosition(Phaser.Math.Clamp(this.pip.x, hw, 1280 - hw), this.pip.y + this.pipArt.top - 18);
       if (color !== undefined) this.pipLabel.setBackgroundColor(SYL.hex(color)).setColor('#ffffff');
       else this.pipLabel.setBackgroundColor('#ffffffdd').setColor(SYL.hex(C.ink));
     }
 
-    async startRun() {
-      if (this.mode !== 'plan') return;
+    lockForRun() {
       this.mode = 'run';
       this.pullToggle = false;
       this.updateOverlay();
       this.runBtn.setEnabled(false);
       this.resetBtn.setEnabled(false);
+      if (this.phaseBtn) this.phaseBtn.setEnabled(false);
+    }
+
+    async startRun() {
+      if (this.mode !== 'plan') return;
+      this.lockForRun();
+      if (this.dayLevel) {
+        // Simulate the whole day once, then play it: the workday here, the evening after the commute.
+        var st = SYL.state;
+        st.run = SYL.day.simulate(this.dayLevel, st.plan.layouts, st.habits, st.night);
+        if (this.phase !== 'work') { this.scene.restart({ phase: 'work', keep: true, running: true }); return; }
+        await this.continueRun();
+        return;
+      }
       this.result = SIM.simulate(this.level, this.layout, SYL.state.habits);
       for (var e of this.result.events) await this.playEvent(e);
       await SYL.wait(this, 500);
+      this.showResult();
+    }
+
+    // Full day: play this half of the day's run, then the commute or the result.
+    async continueRun() {
+      var st = SYL.state;
+      var run = st.run;
+      if (!run) return;
+      this.lockForRun();
+      var half = run[this.phase];
+      var first = half.events[0];
+      this.setClock(first.t !== undefined ? first.t : first.t0);
+      var fx = this.phase === 'work' ? run.night.effects : run.evening.effects;
+      if (fx.length) {
+        this.say(fx.map((f) => f.label).join('  ·  '), fx.every((f) => f.id === 'rested' || f.id === 'moving') ? C.good : C.trap);
+        await SYL.wait(this, 1300);
+      }
+      for (var e of half.events) await this.playEvent(e);
+      await SYL.wait(this, 400);
+      if (this.phase === 'work') {
+        this.toast('Commute home… (30 min)');
+        await SYL.wait(this, 900);
+        this.cameras.main.fadeOut(200, 246, 240, 230);
+        await SYL.wait(this, 220);
+        this.scene.restart({ phase: 'home', keep: true, running: true });
+        return;
+      }
+      this.result = run;
       this.showResult();
     }
 
@@ -720,7 +803,8 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       var why = (hw.helped.length ? 'Helped: ' + hw.helped.join(', ') : 'Nothing helped yet') + (hw.hurt.length ? '.  Held back by: ' + hw.hurt.join(', ') : '') + '.';
       p.add(SYL.text(this, -430, by + 52, why, 14, C.inkSoft, { wordWrap: { width: 400 } }));
       by += 76;
-      var r = CP.research({ res: res, level: L, layout: this.layout });
+      var rctx = this.dayLevel ? { res: res, level: { twist: this.dayLevel.home.twist }, layout: SYL.state.plan.layouts.home } : { res: res, level: L, layout: this.layout };
+      var r = CP.research(rctx);
       p.add(SYL.text(this, -430, by + 36, CP.resultHeading, 12, C.inkSoft, { fontStyle: 'bold' }));
       p.add(SYL.text(this, -430, by + 54, r.text, 15, C.ink, { wordWrap: { width: 390 }, fontStyle: 'italic' }));
       p.add(SYL.text(this, -430, by + 54 + 64, r.src, 12, C.inkSoft));
@@ -733,7 +817,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       p.add(SYL.text(this, 14, 100, L.tip.src, 12, C.inkSoft, { wordWrap: { width: 405 } }));
 
       var last = SYL.state.levelIndex >= CP.levels.length - 1;
-      p.add(SYL.button(this, -150, 225, 240, 56, 'Try again', () => { SYL.audio.duck(false); this.scene.restart(); }, { fill: 0xe7dfd2 }));
+      p.add(SYL.button(this, -150, 225, 240, 56, 'Try again', () => { SYL.audio.duck(false); this.scene.restart({}); }, { fill: 0xe7dfd2 })); // explicit {}: Phaser would reuse the last restart's data
       p.add(SYL.button(this, 150, 225, 240, 56, last ? CP.lastButton : 'Next week', () => this.nextWeek()));
       p.setScale(0.8).setAlpha(0);
       this.tweens.add({ targets: p, scale: 1, alpha: 1, duration: 250, ease: 'Back.out' });
@@ -745,7 +829,8 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     nextWeek() {
       SYL.audio.duck(false);
       var st = SYL.state;
-      st.habits = SIM.updateHabits(st.habits, this.result.done);
+      st.habits = this.dayLevel ? SYL.day.updateHabits(st.habits, this.result.done) : SIM.updateHabits(st.habits, this.result.done);
+      if (this.dayLevel) { st.night = this.result.nextNight; st.plan = null; st.run = null; } // tonight's sleep -> next week's workday
       st.healthWeeks.push(this.healthWeek);
       st.history.push({ week: this.level.week, level: this.level, met: this.result.allMet, stars: this.stars, maxStars: this.maxStars, done: this.result.done, res: this.result });
       st.levelIndex++;
@@ -753,7 +838,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         // Remember how this campaign ended, so an expansion can carry on from it.
         st.results[CP.id] = { endKg: Math.round(SYL.currentKg() * 10) / 10, startKg: st.startKg, healthWeeks: st.healthWeeks.slice(), history: st.history.slice() };
         this.scene.start(CP.ending);
-      } else this.scene.restart();
+      } else this.scene.restart({});
     }
   };
 })();

@@ -89,7 +89,7 @@ SYL.EndingScene = class extends Phaser.Scene {
     var lx = 815;
     g.fillStyle(0xe3f1e8, 1).fillRoundedRect(lx - 14, ty - 8, 452, 378, 14);
     SYL.text(this, lx, ty, 'YOUR SHIFT LIST: TRY THESE IN YOUR LIFE', 13, C.good, { fontStyle: 'bold' });
-    SYL.LEVELS.forEach((L, i) => {
+    SYL.campaign().levels.forEach((L, i) => {
       var y = ty + 24 + i * 50;
       var h = st.history.find(function (x) { return x.week === L.week; });
       var done = h && h.met;

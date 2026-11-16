@@ -1,4 +1,4 @@
-// Office life expansion: the weekly weigh-in for a workday, and the day-84 retest.
+// The workday half of the weekly weigh-in: constants used by SYL.day.healthWeek (src/day.js).
 // Pure logic (no Phaser). Reuses the base game's model and constants (src/health.js):
 // the workday stands for the whole working week, on top of the old-habits surplus.
 //
@@ -45,17 +45,6 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       helped: helped,
       hurt: hurt,
     };
-  };
-
-  // Day 49 and day 84, using the base game's formulas (SYL.health.markers).
-  // Day 49 comes from the home weeks if they were played this session; otherwise
-  // from the default start weight with no exercise effect.
-  O.retests = function (state) {
-    var home = state.results && state.results.home;
-    var d49 = home ? H.retest(home.healthWeeks) : H.markers(O.DEFAULT_START_KG, []);
-    var kg84 = state.startKg + state.healthWeeks.reduce(function (n, w) { return n + w.dKg; }, 0);
-    var d84 = H.markers(kg84, state.healthWeeks);
-    return { d1: H.START, d49: d49, d84: d84 };
   };
 
   SYL.officeHealth = O;

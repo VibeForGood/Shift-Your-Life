@@ -53,10 +53,10 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       brief: 'Skip lunch and the evening snacks get much harder to beat. Feed yourself properly at both ends of the day.',
       moves: 3,
       work: {
-        layout: { phone: 'bag_hook', laptop: 'desktop', lunch: 'fridge', biscuits: 'side_shelf', trainers: 'coat_stand', priority: 'desk_drawer' },
+        layout: { phone: 'bag_hook', laptop: 'desktop', lunch: 'fridge', biscuits: 'desk_drawer', trainers: 'coat_stand', priority: 'side_shelf' },
         twist: null,
       },
-      home: home(2),
+      home: home(2, { layout: Object.assign({}, H[2].layout, { phone: 'dresser' }) }),
       goals: [
         { at: 'work', type: 'did', action: 'lunch', label: 'Proper lunch at work' },
         { at: 'home', type: 'did', action: 'eat', label: 'Proper dinner at home' },
@@ -87,13 +87,12 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       brief: "You owe Maya a call. Your boss sends 'quick question' emails at five.",
       moves: 3,
       work: {
-        layout: { phone: 'desktop', laptop: 'bag_hook', ticket: 'locker', priority: 'side_shelf', biscuits: 'desk_drawer', lunch: 'counter' },
+        layout: { phone: 'side_shelf', laptop: 'desktop', ticket: 'locker', priority: 'bag_hook', biscuits: 'desk_drawer', lunch: 'counter' },
         twist: { id: 'boss', label: '17:00 email', desc: 'Stay late +2.5', mods: { stay: 2.5 } },
       },
       home: home(5),
       goals: [
         { at: 'work', type: 'didnt', action: 'stay', label: 'Leave work on time' },
-        { at: 'work', type: 'didnt', action: 'takehome', label: 'Laptop stays at work' },
         { at: 'home', type: 'did', action: 'call', label: 'Call Maya' },
       ],
       tip: H[5].tip,

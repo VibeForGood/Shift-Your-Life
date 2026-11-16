@@ -6,15 +6,14 @@
 //   "good" = the player solved every earlier week (with a minimal solution)
 //   "bad"  = the player changed nothing in every earlier week
 //
-// Checks the base game (the flat) and the Office life expansion.
+// Checks the seven evening-only home weeks. The full-day game (tools/check-days.js)
+// builds on their flat layouts, twists and tips.
 //
-// Usage: node tools/check-levels.js [--verbose] [--home | --office]
+// Usage: node tools/check-levels.js [--verbose]
 var path = require('path');
 require(path.join(__dirname, '../src/data/world.js'));
 require(path.join(__dirname, '../src/data/levels.js'));
 require(path.join(__dirname, '../src/sim.js'));
-require(path.join(__dirname, '../src/office/world.js'));
-require(path.join(__dirname, '../src/office/levels.js'));
 var SYL = globalThis.SYL;
 var W, SIM;
 var verbose = process.argv.indexOf('--verbose') >= 0;
@@ -112,9 +111,7 @@ function checkCampaign(name, world, levels, endWord) {
   });
 }
 
-var only = process.argv.indexOf('--home') >= 0 ? 'home' : process.argv.indexOf('--office') >= 0 ? 'office' : null;
-if (only !== 'office') checkCampaign('Base game: the flat', SYL.WORLD, SYL.LEVELS, 'asleep');
-if (only !== 'home') checkCampaign('Expansion: Office life', SYL.OFFICE_WORLD, SYL.OFFICE_LEVELS, 'left');
+checkCampaign('Home weeks (the flat)', SYL.WORLD, SYL.LEVELS, 'asleep');
 
 console.log(problems ? '\n' + problems + ' problem(s) found.' : '\nAll levels OK.');
 process.exit(problems ? 1 : 0);
