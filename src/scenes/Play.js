@@ -25,6 +25,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.layout = Object.assign({}, this.level.layout);
       this.mode = 'plan';
       this.objViews = {};
+      this.lastDecide = null; // the scene object is reused between weeks and retries
       this.applySpeed();
 
       this.drawRoom();
@@ -451,7 +452,11 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         // In a time block the same choice can win again and again: show the bubble once.
         var same = this.lastDecide && this.lastDecide.zone === e.zone && this.lastDecide.chosen === e.chosen;
         this.lastDecide = e;
-        if (!same) await this.showDecision(e);
+        if (e.filler) {
+          // The favourite didn't fit before the block ended, so you filled the gap.
+          this.say('No time for ' + W.actions[e.options[0].action].short.toLowerCase() + ' before ' + SIM.fmt(e.until), C.inkSoft);
+          await SYL.wait(this, 700);
+        } else if (!same) await this.showDecision(e);
       } else if (e.type === 'act') {
         await this.playAction(e);
       } else if (e.type === 'sleep') {

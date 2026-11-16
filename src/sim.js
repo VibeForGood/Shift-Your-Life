@@ -5,10 +5,12 @@
 // SYL.sim is the base game's simulator for the flat (SYL.WORLD).
 //
 // World features (all optional, the flat uses none of the starred ones):
-//   route: [{ zone, until*, waitUntil }]  visit order. Default: every zone once.
+//   route: [{ zone, until*, waitUntil, id*, only* }]  visit order. Default: every zone once.
 //       until:     a time block. Decisions repeat here until this time;
 //                  choosing 'carry' leaves the block early.
 //       waitUntil: idle here until this time before deciding (bedtime).
+//       id:        names the stop, for actions with 'at'.
+//       only:      the only actions on offer at this stop.
 //   end: { type, zone }      the closing event ('sleep' in the bedroom by default).
 //   startTime                when the run starts (18:00 by default).
 //   fixed*: { objId: slotId }  things you can't move (vending machine...). Their
@@ -16,6 +18,9 @@
 //   action.ends*             choosing it ends the run (leaving the office).
 //   action.excludes*: [ids]  not available once any of these is done.
 //   action.needs             an object id, or a list (any one of them will do).
+//   action.at*               only offered at the stop with this id (e.g. 'Leave on time').
+//   filler*                  action to fill the end of a time block when the best
+//                            choice no longer fits (checking email before lunch).
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
 SYL.makeSim = function (W) {
@@ -105,11 +110,13 @@ SYL.makeSim = function (W) {
     return list.some(function (o) { return all[o] && reach(all[o], zoneId) > 0; });
   }
 
-  function decide(level, all, habits, zoneId, done) {
+  function decide(level, all, habits, zoneId, done, stop) {
     var options = [];
     Object.keys(W.actions).forEach(function (action) {
       var a = W.actions[action];
       if (a.zones.indexOf(zoneId) < 0) return;
+      if (a.at && (!stop || stop.id !== a.at)) return;
+      if (stop && stop.only && stop.only.indexOf(action) < 0) return;
       if (a.once && done[action]) return;
       if (a.excludes && a.excludes.some(function (x) { return done[x]; })) return;
       if (!hasNeed(a, all, zoneId)) return;
@@ -189,11 +196,24 @@ SYL.makeSim = function (W) {
       }
       if (stop.until) {
         // Time block: keep deciding until the block ends, you carry on, or the day ends.
-        while (t < stop.until && !ended) {
-          var opts = decide(level, all, habits, z, done);
+        // If what you'd do next doesn't fit before the block ends, you wrap up and move
+        // on (you stop for lunch at 12:30). You always get at least one choice, even if
+        // you arrive late.
+        var first = true;
+        while ((first || t < stop.until) && !ended) {
+          var wasFirst = first;
+          first = false;
+          var opts = decide(level, all, habits, z, done, stop);
           if (!opts.length) break;
           var pick = opts[0].action;
-          events.push({ type: 'decide', zone: z, t: t, options: opts, chosen: pick });
+          var fits = function (a) { return !W.actions[a].mins || t + W.actions[a].mins <= stop.until; };
+          if (!wasFirst && !fits(pick)) {
+            // Fill the gap with the world's filler (checking email), or wrap up.
+            var fill = W.filler && opts.find(function (o) { return o.action === W.filler; });
+            if (!fill || !fits(W.filler)) break;
+            pick = W.filler;
+          }
+          events.push({ type: 'decide', zone: z, t: t, options: opts, chosen: pick, filler: pick !== opts[0].action, until: stop.until });
           if (pick === 'carry' || !W.actions[pick].mins) {
             if (pick !== 'carry') act(z, pick);
             break;
@@ -203,7 +223,7 @@ SYL.makeSim = function (W) {
         if (t < stop.until && !ended && stop.hold) t = stop.until; // e.g. lunch hour
         continue;
       }
-      var options = decide(level, all, habits, z, done);
+      var options = decide(level, all, habits, z, done, stop);
       var chosen = options[0].action;
       events.push({ type: 'decide', zone: z, t: t, options: options, chosen: chosen });
       if (chosen !== 'carry' && chosen !== 'sleep') act(z, chosen);

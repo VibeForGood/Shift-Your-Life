@@ -120,6 +120,8 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     create(data) {
       // An expansion can pass its own intro cards: scene.start('Story', { cards: [...] }).
       this.cards = (data && data.cards) || CARDS;
+      this.done = false; // Phaser reuses the scene object: reset on every visit (Play again)
+      this.busy = false;
       this.add.rectangle(640, 360, 1280, 720, C.paper);
       SYL.art.ensureTextures(this);
       this.index = -1;

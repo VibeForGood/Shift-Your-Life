@@ -51,7 +51,13 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
   // The retest, from the list of weekly results.
   H.retest = function (weeks) {
     var S = H.START;
-    var kg = S.kg + weeks.reduce(function (n, w) { return n + w.dKg; }, 0);
+    return H.markers(S.kg + weeks.reduce(function (n, w) { return n + w.dKg; }, 0), weeks);
+  };
+
+  // Results at a given weight; the last four weeks set the exercise and sleep effects.
+  // Expansions use this for later retests.
+  H.markers = function (kg, weeks) {
+    var S = H.START;
     var lost = Math.max(0, S.kg - kg);
     var last4 = weeks.slice(-4);
     var aero = last4.length ? Math.min(1, last4.reduce(function (n, w) { return n + w.active; }, 0) / last4.length / 150) : 0;

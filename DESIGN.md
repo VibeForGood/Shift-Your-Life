@@ -265,7 +265,7 @@ the current build. If the game is ever ported to GameMaker, the data files and
 → itch.io "HTML" project, "played in the browser", 1280×720 viewport, mobile
 friendly (landscape), fullscreen button. Full steps in `ITCH_PAGE.md`. Optionally also GitHub Pages.
 
-## 10. Expansion: Office life (in design, `office-life` branch)
+## 10. Expansion: Office life (in progress, `office-life` branch)
 
 An expansion to the base game (the seven home weeks), treated like DLC. Same verb,
 same rules, new place: your workday at **Halcyon Insurance**, where you work as
@@ -300,13 +300,13 @@ One cutaway floor, fixed camera. Zones from left to right:
 
 | Zone | Slots |
 |---|---|
-| Lobby | coat stand, bag hook, locker (hidden) |
-| Your desk | desktop, side shelf, under desk (far), desk drawer (hidden) |
+| Lobby | coat stand, your bag, locker (hidden) |
+| Your desk | desk, top shelf (far), floor, desk drawer (hidden) |
 | Kitchenette | counter, table, fridge (hidden) |
 
-Fixed things you **can't** move: the lift, the vending machine (kitchenette) and
-your coworker Sam's desk next to yours. They give steady pulls that you have to
-work around, the way a real office does.
+Fixed things you **can't** move: the vending machine (kitchenette) and your
+coworker Sam at the next desk. They give steady pulls that you have to work
+around, the way a real office does. A twist can add more (the birthday cake).
 
 ### 10.3 The workday route
 
@@ -314,66 +314,83 @@ Unlike the evening, your desk is visited twice and desk visits are **time blocks
 you keep making decisions there until the block ends.
 
 ```
-[Lobby]  →  [Desk: morning]  →  [Kitchenette]  →  [Desk: afternoon]  →  [Lobby]
- 08:45       until 12:30          lunch            until 17:30           leave?
+[Lobby]  →  [Desk: morning]  →  [Kitchenette]  →  [Desk: afternoon]  →  [Desk: 17:30]  →  [Lobby]
+ 08:45       until 12:30          until 13:30       until 17:30           leave or stay     out
 ```
 
 | Stop | Choices |
 |---|---|
 | Lobby (arrive) | Take the stairs · Take the lift (default) · Scroll |
-| Desk blocks | Deep work · Check email (default) · Scroll · Chat with Sam · Snack · Stand while working · Refill water |
-| Kitchenette | Proper lunch · Vending machine · Lunch walk · Back to desk (eat at desk) |
-| Lobby (leave) | Leave on time · Stay late · Take the laptop home |
+| Desk blocks | Deep work · Check email (default) · Scroll · Chat with Sam · Snack · Work standing up · Refill water |
+| Kitchenette | Proper lunch · Vending machine lunch · Lunchtime walk · Carry on (back to your desk) |
+| Desk (17:30) | Leave on time · Stay late (30 min at a time, until 19:30) |
+| Lobby (out) | Take the laptop home · Carry on |
 
-Checking email is the office's "Carry on": a fixed baseline that weak cues can't beat.
+Time-block rules:
+- Checking email is the default at the desk: a fixed baseline that weak cues can't beat.
+- You always get at least one choice at a stop, even if you arrive late.
+- If what you'd do next doesn't fit before the block ends, you check email
+  instead if that fits, or wrap up and move on. Deep work doesn't eat your lunch hour.
+- The same choice winning again and again in a block shows its bubble only once.
+- A proper lunch fills you up: no snacking afterwards. Lunch and the vending
+  machine rule each other out.
 
-### 10.4 Objects (10)
+### 10.4 Objects (11 + fixed)
 
 | Object | Pulls towards | Notes |
 |---|---|---|
-| Phone | **Scroll** (strong) | Lowers Deep work by 2 wherever it reaches, as at home. |
-| Work laptop | **Deep work** at the desk | In the lobby bag it pulls **Take the laptop home** instead. In the locker: no pull at all. |
+| Phone | **Scroll** | Lowers Deep work by 2 wherever it reaches, as at home. |
+| Work laptop | **Deep work** at the desk | In your bag in the lobby it pulls **Take the laptop home**. |
 | Priority list | **Deep work** | A sticky note with today's one big task. |
-| Noise-cancelling headphones | **Deep work** | Cancels Sam's chat pull. |
+| Noise-cancelling headphones | **Deep work** | At your desk, cancels the open-plan noise twist. |
 | Biscuit tin | **Snack** (strong) | The office version of the snack jar. |
-| Packed lunch | **Proper lunch** | Competes with the vending machine. |
-| Water bottle | **Refill water** | Each refill is a short walk: also counts towards moving more. |
-| Trainers | **Stairs**, **Lunch walk** | Strongest in the lobby and kitchenette. |
-| Standing mat | **Stand while working** | Only works at the desk. |
-| Evening plans (Maya's cinema ticket) | **Leave on time** | Ties back to the base game. |
+| Packed lunch | **Proper lunch** (strong) | Competes with the vending machine and the cake. |
+| Water bottle | **Refill water** | |
+| Trainers | **Stairs**, **Lunch walk** | One pair can't be in the lobby and the kitchenette at once. |
+| Stairs reminder | **Stairs** | A note by the lift: a point-of-decision prompt. |
+| Standing mat | **Work standing up** | Only goes on the floor or in the locker. |
+| Maya's cinema ticket | **Leave on time** | Ties back to the base game. |
+| *Sam (fixed)* | Chat | At the next desk. |
+| *Vending machine (fixed)* | Vending machine lunch | |
+| *Birthday cake (fixed, week 3)* | Snack | |
 
 ### 10.5 Weeks (5)
 
 | Week | Shift | Twist | Goals | Moves | Real-life tip (sources to verify) |
 |---|---|---|---|---|---|
-| O1 | Deep work | Open-plan noise | 2 h deep work · no scrolling at your desk | 2 | Phone out of reach, check email in batches (Ward 2017; Kushlev & Dunn 2015; Mark 2008) |
+| O1 | Deep work | Open-plan noise | 2 h deep work · no scrolling | 2 | Phone out of sight, check email at set times (Leroy 2009; Ward 2017; Kushlev & Dunn 2015) |
 | O2 | Move more | — | Stairs · lunch walk · stand for an hour | 3 | Cues at the point of decision; break up sitting (Soler 2010; Shrestha 2018; Thøgersen-Ntoumani 2015) |
-| O3 | Food at work | Birthday cake in the kitchenette | Proper lunch · no vending or biscuits · drink water | 3 | Make the good option the visible one (Thorndike 2012; Hollands 2019) |
-| O4 | Leave on time | Boss emails at 17:00 | Leave by 17:45 · laptop stays at work · 1 h deep work | 3 | Switch off after work (Sonnentag & Fritz 2015; Becker 2021) |
-| O5 | The whole day | Deadline week | Deep work · stairs or lunch walk · proper lunch · leave on time | 3 | If-then plans for busy days (Gollwitzer & Sheeran 2006) |
+| O3 | Food at work | Birthday cake in the kitchenette | Proper lunch · no vending machine, no snacks · refill water | 3 | Make the good option the visible one (Thorndike 2012; Hollands 2019) |
+| O4 | Leave on time | Boss emails at 17:00 | Leave on time · laptop stays at work · 1 h deep work | 3 | Switch off after work (Sonnentag & Fritz 2015; Becker 2021) |
+| O5 | The whole day | Deadline week | Some deep work · stairs or lunch walk · proper lunch · leave on time | 3 | If-then plans for busy days (Gollwitzer & Sheeran 2006) |
 
 Every source above is a candidate. Each must be added to
-`SelfImprovement_Research.md` and checked before it appears in the game.
+`SelfImprovement_Research.md` and checked before it appears in the game. Until
+then the result card's research line only uses lines already checked for the
+base game.
+
+**Weekly weigh-in** (`src/office/health.js`): the base game's model, with a
+proper lunch (-300 kcal/day), no snacking (as at home) and lunchtime walks
+(-100 kcal/day averaged, 150 active minutes a week). Stairs add 25 active
+minutes. Staying late and taking work home show up as "held back by".
+Illustrative numbers, to be checked like the rest.
 
 **Ending:** day 84, **second retest with Dr Reyes**, in the same style as the
 home ending. It compares day 1, day 49 and day 84: weight, blood pressure, HbA1c
 (day 84 is about three months in, so this estimate is less early than the
-day-49 one) and diabetes risk. Next to the numbers it shows your office shift
-list, with the five office tips, ticked where you nailed the week.
+day-49 one), diabetes risk and active minutes. Next to the numbers it shows your
+office shift list, with the five office tips, ticked where you nailed the week.
 
-### 10.6 What the code needs
+### 10.6 How it's built
 
-- `world.js` → one world per game area (`SYL.WORLDS.home` in the base game, `SYL.WORLDS.office` registered by the expansion);
-  each level names its world. `sim.js` takes the world as a parameter (still no Phaser).
-- Separate zone **layout** (for reach) from the **route** (visit order), so the
-  desk can be visited twice.
-- **Time-block zones**: decisions repeat at a zone until its end time.
-- **Fixed pull sources** (lift, vending machine, Sam) that aren't draggable.
-- Everything office-only (world data, levels, art, intro cards, ending) goes in
-  `src/office/`. Base files only get generic hooks (world parameter, time
-  blocks, fixed pulls, a title-screen slot for an expansion), never office content.
-- `health.js` accepts a starting weight and office inputs; the ending can show
-  three points in time (day 1, 49, 84).
+- `src/sim.js` is `SYL.makeSim(world)`; `SYL.sim` is the flat's. Optional world
+  features: a route that can revisit zones, time blocks, stop-only actions,
+  fixed objects, actions that end the run, a filler action, minute totals.
+- `src/campaign.js` holds the campaign registry. The flat registers as `home`; the
+  expansion registers `office` with its world, weeks, labels, weigh-in, intro
+  cards and ending scene. The scenes read the current campaign.
+- Everything office-only is in `src/office/` (world, levels, health, art,
+  campaign, ending). Base files only have generic hooks.
 - `tools/check-levels.js` and `tests/smoke.js` cover the base game and the expansion.
 
 ### 10.7 Decided

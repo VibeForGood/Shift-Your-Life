@@ -135,4 +135,4 @@ Keep this updated so the itch.io AI disclosure is accurate.
 | 2026-11-15 | Claude Code | Decision popup layout fix: effect breakdown on its own wrapped line so it no longer overlaps the activity title. |
 | 2026-11-15 | Claude Code | Phone/tablet touch testing, itch.io build zip, and updating the .md docs to match the current game. |
 | 2026-11-15 | Copilot SDK in VS Code | Reviewed Markdown files for public readability; aligned design notes and AI credits, and replaced copied FAQ text with a brief summary and official links. |
-| 2026-11-16 | Claude Code | Version label on the title screen; design for the Office life expansion (DESIGN.md §10). |
+| 2026-11-16 | Claude Code | Version label on the title screen; design for the Office life expansion (DESIGN.md §10). Engine generalised into campaigns; Office life expansion built (office world, five weeks, art, weigh-in, intro, day-84 ending), level checker and smoke test extended. |
