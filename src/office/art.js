@@ -140,21 +140,24 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     });
 
     var f = scene.add.graphics().setDepth(2);
-    // --- Lobby: lift doors, stairs sign, coat stand, lockers, welcome mat
-    shapes(f, [{ t: 'rr', x: 128, y: 150, w: 92, h: 140, r: 4, c: 0xb9c4cf }], 4);
-    f.fillStyle(0xd5dde5, 1).fillRect(134, 158, 39, 126).fillRect(175, 158, 39, 126);
-    shapes(f, [{ t: 'rr', x: 160, y: 132, w: 28, h: 14, r: 3, c: 0x2f2d3a }], 3);
-    f.fillStyle(0xf2b84b, 1).fillTriangle(168, 142, 174, 135, 180, 142);
-    SYL.text(scene, 174, 296, 'LIFT', 11, INK, { fontStyle: 'bold' }).setOrigin(0.5, 0).setDepth(2);
-    // Stairs door with a green sign
-    shapes(f, [{ t: 'rr', x: 74, y: 300, w: 18, h: 12, r: 2, c: 0x4fae78 }], 3);
-    line(f, 4, 0x8c7a6a, 110, 290, 110, 438);
-    f.fillStyle(0x8c7a6a, 1).fillCircle(110, 288, 6);
+    // --- Lobby: lift (standing on the floor), stairs sign, coat stand, full-height locker
+    shapes(f, [{ t: 'rr', x: 140, y: 200, w: 86, h: 240, r: 4, c: 0xb9c4cf }], 4);
+    f.fillStyle(0xd5dde5, 1).fillRect(146, 208, 36, 226).fillRect(184, 208, 36, 226);
+    shapes(f, [{ t: 'rr', x: 169, y: 182, w: 28, h: 14, r: 3, c: 0x2f2d3a }], 3);
+    f.fillStyle(0xf2b84b, 1).fillTriangle(177, 192, 183, 185, 189, 192);
+    SYL.text(scene, 183, 164, 'LIFT', 11, INK, { fontStyle: 'bold' }).setOrigin(0.5, 0).setDepth(2);
+    // Green stairs sign on the wall between the lift and the locker
+    shapes(f, [{ t: 'rr', x: 232, y: 300, w: 24, h: 14, r: 2, c: 0x4fae78 }], 3);
+    f.fillStyle(0xffffff, 1).fillTriangle(240, 311, 248, 311, 248, 303);
+    // Coat stand: pole to the floor, hooks at the top
+    line(f, 4, 0x8c7a6a, 110, 210, 110, 438);
+    f.fillStyle(0x8c7a6a, 1).fillCircle(110, 208, 6);
+    line(f, 3, 0x8c7a6a, 110, 218, 96, 226); line(f, 3, 0x8c7a6a, 110, 218, 124, 226);
     line(f, 4, 0x8c7a6a, 96, 438, 124, 438);
     shapes(f, [
-      { t: 'rr', x: 262, y: 160, w: 58, h: 140, r: 4, c: 0x8fa8c8 },
+      { t: 'rr', x: 262, y: 160, w: 58, h: 280, r: 4, c: 0x8fa8c8 },
     ], 4);
-    f.fillStyle(0x7d96b6, 1).fillRect(268, 166, 22, 128).fillRect(292, 166, 22, 128);
+    f.fillStyle(0x7d96b6, 1).fillRect(268, 166, 22, 268).fillRect(292, 166, 22, 268);
     f.fillStyle(INK, 1).fillRect(284, 220, 3, 12).fillRect(295, 220, 3, 12);
     shapes(f, [{ t: 'rr', x: 196, y: 396, w: 58, h: 44, r: 6, c: 0x5a6b8a }], 4);
     f.fillStyle(0x4a5a78, 1).fillRoundedRect(204, 386, 42, 14, 6);
@@ -173,13 +176,24 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       { t: 'rr', x: 484, y: 420, w: 8, h: 16, r: 2, c: 0x2f2d3a },
       { t: 'rr', x: 468, y: 432, w: 40, h: 6, r: 3, c: 0x2f2d3a },
     ], 4);
+    // Drawer pedestal under the right of the desk (the desk drawer slot sits in it)
+    shapes(f, [{ t: 'rr', x: 524, y: 372, w: 54, h: 68, r: 3, c: 0xc49a6c }], 4);
+    f.fillStyle(0xdcb88e, 1).fillRoundedRect(529, 378, 44, 26, 2).fillRoundedRect(529, 408, 44, 26, 2);
+    f.fillStyle(INK, 1).fillRect(545, 389, 12, 3).fillRect(545, 419, 12, 3);
+    // Top shelf on two brackets
     shapes(f, [{ t: 'rr', x: 566, y: 256, w: 92, h: 10, r: 3, c: 0xdcb88e }], 4);
-    // Sam's desk
-    shapes(f, [
+    f.fillStyle(0x6b6880, 1).fillTriangle(575, 266, 587, 266, 575, 278).fillTriangle(649, 266, 637, 266, 649, 278);
+    // Sam's desk: his chair behind him, the desk front drawn over him so he sits behind it
+    shapes(f, [{ t: 'rr', x: 742, y: 318, w: 46, h: 60, r: 12, c: 0x4a5a78 }], 4);
+    var samDesk = scene.add.graphics().setDepth(11);
+    shapes(samDesk, [
       { t: 'rr', x: 700, y: 368, w: 10, h: 72, r: 2, c: 0x6b6880 },
       { t: 'rr', x: 812, y: 368, w: 10, h: 72, r: 2, c: 0x6b6880 },
       { t: 'rr', x: 692, y: 358, w: 136, h: 14, r: 4, c: 0xdcb88e },
+      { t: 'rr', x: 796, y: 320, w: 30, h: 24, r: 3, c: 0x3a3848 },
+      { t: 'rr', x: 806, y: 344, w: 10, h: 14, r: 2, c: 0x6b6880 },
     ], 4);
+    samDesk.fillStyle(0xdff2ff, 1).fillRoundedRect(799, 323, 24, 18, 2);
     // Wall clock
     shapes(f, [{ t: 'c', x: 470, y: 190, r: 20, c: 0xffffff }], 4);
     line(f, 3, INK, 470, 190, 470, 177); line(f, 3, INK, 470, 190, 480, 194);
@@ -187,22 +201,31 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     shapes(f, [{ t: 'rr', x: 350, y: 404, w: 28, h: 36, r: 4, c: 0xd98c6a }], 4);
     f.fillStyle(0x4fae78, 1).fillEllipse(356, 392, 18, 30).fillEllipse(372, 388, 18, 34).fillEllipse(364, 380, 16, 30);
     // --- Kitchenette: cupboards, counter + sink, fridge, table
+    // Wall cupboards; a wider counter (room for the cake) with the sink in the middle
     shapes(f, [
       { t: 'rr', x: 856, y: 160, w: 120, h: 70, r: 6, c: 0x7fb6a4 },
-      { t: 'rr', x: 848, y: 382, w: 120, h: 14, r: 4, c: 0xf4efe6 },
-      { t: 'rr', x: 852, y: 396, w: 112, h: 44, r: 3, c: 0x7fb6a4 },
+      { t: 'rr', x: 848, y: 382, w: 150, h: 14, r: 4, c: 0xf4efe6 },
+      { t: 'rr', x: 852, y: 396, w: 142, h: 44, r: 3, c: 0x7fb6a4 },
     ], 4);
     f.fillStyle(0x93c6b5, 1).fillRoundedRect(862, 166, 52, 58, 4).fillRoundedRect(918, 166, 52, 58, 4);
-    f.fillStyle(0x9aa7b8, 1).fillRoundedRect(930, 384, 30, 8, 3);
+    f.fillStyle(0x9aa7b8, 1).fillRoundedRect(905, 384, 30, 8, 3);
+    // Full-height fridge standing on the floor
     shapes(f, [
-      { t: 'rr', x: 1150, y: 170, w: 84, h: 150, r: 8, c: 0xf4f6f8 },
+      { t: 'rr', x: 1150, y: 230, w: 84, h: 210, r: 8, c: 0xf4f6f8 },
     ], 4);
-    line(f, 2, 0xc9d0d8, 1150, 250, 1234, 250);
-    f.fillStyle(INK, 1).fillRect(1222, 200, 4, 30).fillRect(1222, 262, 4, 40);
+    line(f, 2, 0xc9d0d8, 1150, 300, 1234, 300);
+    f.fillStyle(INK, 1).fillRect(1222, 250, 4, 30).fillRect(1222, 320, 4, 50);
+    // Vending machine body, taller than a person (its front is the vending icon)
+    shapes(f, [{ t: 'rr', x: 1086, y: 230, w: 52, h: 210, r: 4, c: 0xe0645a }], 4);
+    f.fillStyle(0xdff2ff, 1).fillRect(1092, 240, 40, 120);
+    [[1096, 248, 0xf2b84b], [1108, 248, 0x5a8fd8], [1120, 248, 0x4fae78], [1096, 276, 0xe0645a], [1108, 276, 0xf2b84b], [1120, 276, 0x8b7bb8], [1096, 304, 0x5a8fd8], [1108, 304, 0xe0645a], [1120, 304, 0x4fae78], [1096, 332, 0xf2b84b], [1108, 332, 0x8b7bb8]].forEach(function (s) {
+      f.fillStyle(s[2], 1).fillRoundedRect(s[0], s[1], 8, 14, 2);
+    });
+    // A small table
     shapes(f, [
-      { t: 'rr', x: 1020, y: 410, w: 10, h: 30, r: 2, c: 0x6b6880 },
-      { t: 'rr', x: 1072, y: 410, w: 10, h: 30, r: 2, c: 0x6b6880 },
-      { t: 'rr', x: 1004, y: 402, w: 94, h: 10, r: 4, c: 0xffffff },
+      { t: 'rr', x: 1018, y: 410, w: 8, h: 30, r: 2, c: 0x6b6880 },
+      { t: 'rr', x: 1066, y: 410, w: 8, h: 30, r: 2, c: 0x6b6880 },
+      { t: 'rr', x: 1010, y: 402, w: 72, h: 10, r: 4, c: 0xffffff },
     ], 4);
 
     // --- Animated bits: the front door (left edge), windows
