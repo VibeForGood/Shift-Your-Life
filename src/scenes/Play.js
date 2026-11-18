@@ -60,8 +60,10 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       this.overlayTexts = [];
       this.setupInput();
       this.refresh();
-      if (this.running) this.time.delayedCall(250, () => this.continueRun());
-      else this.showBrief();
+      if (this.running) {
+        if (this.dayLevel && st.run) this.startLiveGoals(); // show what the workday already settled
+        this.time.delayedCall(250, () => this.continueRun());
+      } else this.showBrief();
       SYL.muteButton(this);
 
       SYL.debug = this; // handy for automated tests
@@ -153,7 +155,12 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         this.effectViews.push(t);
         y += 24;
       };
-      if (!fx) { add('This evening depends on your workday', C.inkSoft); return; }
+      if (!fx) {
+        // Before the day has run: spell out what the workday can bring home.
+        add('This evening depends on your workday:', C.inkSoft);
+        SYL.day.EVENING_HINTS.forEach((h) => add(h.when + ' → ' + h.label + '  ·  ' + h.desc, h.id === 'moving' ? C.good : C.trap));
+        return;
+      }
       var good = { rested: 1, moving: 1 };
       fx.forEach((f) => add((this.phase === 'work' ? 'Last night: ' : 'From work: ') + f.label + '  ·  ' + f.desc, good[f.id] ? C.good : C.trap));
     }
@@ -414,6 +421,12 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       p.add(SYL.text(this, -330, y, CP.goalsHeading, 14, C.inkSoft, { fontStyle: 'bold' }));
       L.goals.forEach((gl, i) => p.add(SYL.text(this, -330, y + 22 + i * gap, '○  ' + gl.label, 20, C.ink)));
       var gy = y + 22 + L.goals.length * gap + (DL ? 6 : 10);
+      if (DL && DL.link) {
+        // How this week's work and home goals connect (e.g. stairs -> Already moving -> run).
+        var linkT = SYL.text(this, -330, gy, DL.link, 16, C.good, { fontStyle: 'bold', wordWrap: { width: 660 } });
+        p.add(linkT);
+        gy += linkT.height + 10;
+      }
       var how = DL
         ? (L.week === 1 ? 'Move up to ' + L.moves + ' things across work AND home. Drag to new spots, hold SHIFT to see pulls, switch places with Plan home.' : 'Up to ' + L.moves + ' moves across work and home. Your habits and last night come with you.')
         : L.week === 1
@@ -519,6 +532,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         return;
       }
       this.result = SIM.simulate(this.level, this.layout, SYL.state.habits);
+      this.startLiveGoals();
       for (var e of this.result.events) await this.playEvent(e);
       await SYL.wait(this, 500);
       this.showResult();
@@ -530,6 +544,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       var run = st.run;
       if (!run) return;
       this.lockForRun();
+      this.startLiveGoals();
       var half = run[this.phase];
       var first = half.events[0];
       this.setClock(first.t !== undefined ? first.t : first.t0);
@@ -587,6 +602,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         } else if (!same) await this.showDecision(e);
       } else if (e.type === 'act') {
         await this.playAction(e);
+        this.liveAct(e.action);
       } else if (e.type === 'sleep') {
         this.say('Asleep at ' + SIM.fmt(e.t), C.rest);
         this.idleTween.pause();
@@ -611,7 +627,68 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         await SYL.tween(this, { targets: this.pip, x: this.apt.exitX || 40, duration: 600, ease: 'Quad.in' });
         this.pip.setAlpha(0.25);
         if (this.apt.door) this.tweens.add({ targets: this.apt.door, scaleX: 1, duration: 200 });
+        this.settleWorkGoals(false);
       }
+    }
+
+    // ---------- live goals ----------
+    // Goals tick during the run as soon as they're settled, not only on the result
+    // screen. "Do X" / "N minutes of X" goals tick the moment they're reached. Work
+    // goals settle (tick or cross) when you leave work. "Don't do X all day", bedtime
+    // and alarm goals can only be judged at the end, so they wait for the result.
+
+    // Is this goal decided by what happens in the place being shown now?
+    goalInPhase(g) { return !this.dayLevel || g.at === 'day' || g.at === this.phase; }
+
+    startLiveGoals() {
+      var run = this.dayLevel && SYL.state.run;
+      var fromWork = run && this.phase === 'home' ? run.work : null;
+      this.goalShown = this.level.goals.map(() => null);
+      // Day-long goals count the workday too; place goals count only this place.
+      this.live = {
+        phase: { done: {}, mins: {} },
+        day: { done: Object.assign({}, fromWork && fromWork.done), mins: Object.assign({}, fromWork && fromWork.mins) },
+      };
+      if (fromWork) this.settleWorkGoals(true);
+      this.checkLiveGoals(true);
+    }
+
+    liveAct(action) {
+      if (!this.live) return;
+      var a = W.actions[action];
+      [this.live.phase, this.live.day].forEach((c) => {
+        c.done[action] = true;
+        if (a.habit) c.done[a.habit] = true;
+        c.mins[action] = (c.mins[action] || 0) + (a.mins || 0);
+      });
+      this.checkLiveGoals(false);
+    }
+
+    checkLiveGoals(quiet) {
+      var reachable = { did: 1, any: 1, minutes: 1 };
+      this.level.goals.forEach((g, i) => {
+        if (this.goalShown[i] !== null || !reachable[g.type] || !this.goalInPhase(g)) return;
+        var c = this.dayLevel && g.at === 'day' ? this.live.day : this.live.phase;
+        if (SIM.evalGoal(g, c)) this.markGoal(i, true, quiet);
+      });
+    }
+
+    // The workday's goals are final once you've left (the run is already simulated).
+    settleWorkGoals(quiet) {
+      var run = this.dayLevel && SYL.state.run;
+      if (!run || !this.goalShown) return;
+      this.level.goals.forEach((g, i) => {
+        if (g.at === 'work' && this.goalShown[i] === null) this.markGoal(i, run.goals[i].met, quiet);
+      });
+    }
+
+    markGoal(i, met, quiet) {
+      this.goalShown[i] = met;
+      var t = this.goalTexts[i];
+      t.setText((met ? '✓  ' : '✗  ') + this.level.goals[i].label).setColor(SYL.hex(met ? C.good : C.trap));
+      if (quiet) return;
+      SYL.audio.play('goal', met);
+      this.tweens.add({ targets: t, scale: 1.12, duration: 140, yoyo: true, ease: 'Quad.out' });
     }
 
     async showDecision(e) {

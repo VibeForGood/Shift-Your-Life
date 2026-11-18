@@ -39,6 +39,15 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return out;
   };
 
+  // What can carry from work into the evening, for the home plan before the day has
+  // run. Keep in step with eveningEffects below.
+  D.EVENING_HINTS = [
+    { id: 'moving', when: 'Stairs or lunch walk', label: 'Already moving', desc: 'Run +1' },
+    { id: 'hungry', when: 'No proper lunch', label: 'Hungry', desc: 'Snack +2' },
+    { id: 'frazzled', when: 'Under 1h deep work', label: 'Frazzled', desc: 'Rest +1, Scroll +1' },
+    { id: 'workemail', when: 'Laptop comes home', label: 'Work email', desc: 'Scroll +1, Sleep -1' },
+  ];
+
   // Today's work -> this evening.
   D.eveningEffects = function (work) {
     var d = work.done;

@@ -28,6 +28,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         { at: 'work', type: 'did', action: 'stairs', label: 'Take the stairs at work' },
         { at: 'home', type: 'did', action: 'run', label: 'Go for a run after work' },
       ],
+      link: "Your workday follows you home: take the stairs and you'll be Already moving tonight (Run +1).",
       tip: H[0].tip,
     },
     {
