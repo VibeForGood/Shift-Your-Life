@@ -27,7 +27,7 @@ held upright. iPhones play no sound while the silent switch is on.
 - All art is drawn in code (`src/art.js`). No image files.
 - The fictional story and character draw on ideas from the developer's earlier prototypes.
 - Research sources are listed in `SelfImprovement_Research.md`. This game is not medical advice.
-- Made with AI assistance, including Claude Code and Copilot SDK in VS Code. See the AI usage log in `JAM_RULES.md`.
+- Made with AI assistance, including Claude Code and Copilot SDK in VS Code.
 
 ## License
 

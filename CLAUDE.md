@@ -27,8 +27,7 @@ Browser game (Phaser 3, plain JS, no build step) for **GitHub Game Off 2026**
   stay free of Phaser so the checkers can run them in Node.
 - **Research:** `SelfImprovement_Research.md` holds the self-help techniques
   the game draws on.
-- **AI disclosure:** AI use must be disclosed on submission. When you do
-  meaningful work on this project, add a row to the "AI usage log" table at
-  the bottom of `JAM_RULES.md`.
+- **AI disclosure:** AI use is disclosed by ticking the boxes on the itch.io
+  submission form. No AI usage log is kept.
 - **Third-party assets:** only use assets we made or have permission to use,
   and record attribution in the README.
