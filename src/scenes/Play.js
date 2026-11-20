@@ -141,8 +141,9 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     // Full day: what carries into this half (last night -> work, work -> evening).
     dayEffects() {
       var st = SYL.state;
-      if (this.phase === 'work') return SYL.day.nightEffects(st.night).effects;
-      return st.run ? st.run.evening.effects : null; // the evening depends on how the workday goes
+      if (this.phase === 'work') return SYL.day.nightFor(this.dayLevel, st.night).effects;
+      if (st.run) return st.run.evening.effects;
+      return SYL.day.carries(this.dayLevel, 'evening') ? null : []; // null: the evening depends on how the workday goes
     }
 
     drawEffects() {
@@ -410,9 +411,9 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         p.add(SYL.text(this, -330, y, (tw[0] ? tw[0] + ' · ' : '') + tw[1].label + ':  ' + tw[1].desc, 16, 0xffffff, { backgroundColor: SYL.hex(C.trap), padding: { x: 8, y: 4 }, fontStyle: 'bold' }));
         y += DL ? 34 : 40;
       });
-      if (DL) {
+      if (DL && SYL.day.carries(DL, 'night')) {
         // How last night left you, for today's work.
-        var fx = SYL.day.nightEffects(SYL.state.night).effects;
+        var fx = SYL.day.nightFor(DL, SYL.state.night).effects;
         var lastNight = SYL.state.night ? 'Last night' : 'Last night (your old habits)';
         p.add(SYL.text(this, -330, y, lastNight + ':  ' + fx.map((f) => f.label + ' (' + f.desc + ')').join('  ·  '), 15, fx.some((f) => f.id === 'rested') && fx.length === 1 ? C.good : C.trap, { fontStyle: 'bold', wordWrap: { width: 660 } }));
         y += fx.length > 1 ? 44 : 30;
@@ -421,9 +422,9 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
       p.add(SYL.text(this, -330, y, CP.goalsHeading, 14, C.inkSoft, { fontStyle: 'bold' }));
       L.goals.forEach((gl, i) => p.add(SYL.text(this, -330, y + 22 + i * gap, '○  ' + gl.label, 20, C.ink)));
       var gy = y + 22 + L.goals.length * gap + (DL ? 6 : 10);
-      if (DL && DL.link) {
-        // How this week's work and home goals connect (e.g. stairs -> Already moving -> run).
-        var linkT = SYL.text(this, -330, gy, DL.link, 16, C.good, { fontStyle: 'bold', wordWrap: { width: 660 } });
+      if (DL && DL.newRule) {
+        // The rule this week adds (mechanics arrive one at a time).
+        var linkT = SYL.text(this, -330, gy, 'New this week: ' + DL.newRule, 16, C.good, { fontStyle: 'bold', wordWrap: { width: 660 } });
         p.add(linkT);
         gy += linkT.height + 10;
       }

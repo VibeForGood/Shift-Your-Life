@@ -67,13 +67,34 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
     return { done: done, mins: mins, endAt: home.endAt, asleepAt: home.asleepAt, alarmOk: home.alarmOk, leftWorkAt: work.endAt };
   }
 
+  // The carry-overs are taught one at a time: a week can switch them off with
+  // carries: { night: false, alarm: false, evening: false } (see src/data/days.js).
+  //   night:   last night's sleep -> Rested / Tired at work
+  //   alarm:   no alarm in the bedroom last night -> Overslept
+  //   evening: today's work -> Hungry / Frazzled / Work email / Already moving at home
+  D.carries = function (level, which) { return !level.carries || level.carries[which] !== false; };
+
+  // Last night -> this level's workday (nothing if this week doesn't use it yet).
+  D.nightFor = function (level, night) {
+    if (!D.carries(level, 'night')) return { effects: [], start: null, skipStops: null };
+    if (night && !D.carries(level, 'alarm')) night = Object.assign({}, night, { alarmOk: true });
+    return D.nightEffects(night);
+  };
+
+  // Today's work -> this level's evening. You still get home after the commute.
+  D.eveningFor = function (level, work) {
+    var e = D.eveningEffects(work);
+    if (!D.carries(level, 'evening')) e.effects = [];
+    return e;
+  };
+
   // Run one day. level: an entry of SYL.DAYS. layouts: { work: {...}, home: {...} }.
   // night: last night's { asleepAt, alarmOk } (null in week 1).
   D.simulate = function (level, layouts, habits, night) {
-    var n = D.nightEffects(night);
+    var n = D.nightFor(level, night);
     var wl = { twist: level.work.twist, goals: [], effects: n.effects, start: n.start, skipStops: n.skipStops };
     var work = D.work.simulate(wl, layouts.work, habits);
-    var e = D.eveningEffects(work);
+    var e = D.eveningFor(level, work);
     var hl = { twist: level.home.twist, goals: [], effects: e.effects, start: e.start };
     var home = D.home.simulate(hl, layouts.home, habits);
     var day = merge(work, home);

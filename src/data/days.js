@@ -5,6 +5,12 @@
 // the simulator's (src/sim.js evalGoal). The flat's layouts, twists and tips come
 // from the home weeks (src/data/levels.js), whose tips are already checked
 // against SelfImprovement_Research.md.
+//
+// Mechanics arrive one at a time, so early weeks switch carry-overs off:
+//   carries: { night, alarm, evening }  false = this week doesn't use it yet
+//                                       (default: all on; see src/day.js D.carries)
+//   newRule: the rule this week adds, shown on the week card as "New this week: ..."
+//   Week 1: none. Week 2: last night's sleep. Week 3: oversleeping and work -> evening.
 var SYL = (globalThis.SYL = globalThis.SYL || {});
 
 (function () {
@@ -28,7 +34,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         { at: 'work', type: 'did', action: 'stairs', label: 'Take the stairs at work' },
         { at: 'home', type: 'did', action: 'run', label: 'Go for a run after work' },
       ],
-      link: "Your workday follows you home: take the stairs and you'll be Already moving tonight (Run +1).",
+      carries: { night: false, evening: false }, // week 1 teaches one thing: put the cue where you'll be
       tip: H[0].tip,
     },
     {
@@ -46,6 +52,8 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         { at: 'home', type: 'asleepBy', time: 23 * 60, label: 'Asleep by 23:00' },
         { at: 'home', type: 'alarm', label: 'Alarm in the bedroom' },
       ],
+      carries: { alarm: false, evening: false }, // the alarm is taught this week, so oversleeping counts from week 3
+      newRule: 'how you slept last night carries into your workday. In bed by 23:00 and you start Rested; up late and you start Tired. From next week, no alarm in the bedroom means you oversleep.',
       tip: H[1].tip,
     },
     {
@@ -63,6 +71,7 @@ var SYL = (globalThis.SYL = globalThis.SYL || {});
         { at: 'home', type: 'did', action: 'eat', label: 'Proper dinner at home' },
         { at: 'day', type: 'didnt', action: 'snack', label: 'No snacking all day' },
       ],
+      newRule: "your workday follows you home. Skip lunch and you're Hungry, skip deep work and you're Frazzled, take the stairs or a lunch walk and you're Already moving.",
       tip: H[2].tip,
     },
     {
